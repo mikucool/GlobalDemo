@@ -20,6 +20,7 @@ class GlobalDemoApplication : Application() {
 
     private fun initSdk() {
         AdUseCase.initKwaiAd(this)
+        AdUseCase.initBigoAd(this)
         ThinkingDataUtil.initThinkingDataAnalytics(this)
         SMUtil.initSM(this)
     }

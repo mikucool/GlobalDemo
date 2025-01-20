@@ -89,6 +89,8 @@ dependencies {
     implementation(libs.adimpl)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.appcompat)
+    // bigo
+    implementation("com.bigossp:bigo-ads:5.1.0")
     // thinking data
     implementation(libs.thinkinganalyticssdk)
     // 数盟
