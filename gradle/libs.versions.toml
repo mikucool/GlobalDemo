@@ -1,6 +1,8 @@
 [versions]
 adapi = "1.2.16"
 agp = "8.7.3"
+applovinSdk = "+"
+bigoAds = "5.1.0"
 converterGson = "2.9.0"
 datastorePreferences = "1.1.2"
 dusdk = "8.0.9"
@@ -24,6 +26,8 @@ adimpl = { module = "io.github.kwainetwork:adImpl", version.ref = "adapi" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3Exoplayer" }
+applovin-sdk = { module = "com.applovin:applovin-sdk", version.ref = "applovinSdk" }
+bigo-ads = { module = "com.bigossp:bigo-ads", version.ref = "bigoAds" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 dusdk = { module = "cn.shuzilm.core:dusdk", version.ref = "dusdk" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
@@ -48,4 +52,3 @@ thinkinganalyticssdk = { module = "cn.thinkingdata.android:ThinkingAnalyticsSDK"
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-

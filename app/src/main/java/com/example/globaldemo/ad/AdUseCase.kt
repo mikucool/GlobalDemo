@@ -2,6 +2,9 @@ package com.example.globaldemo.ad
 
 import android.content.Context
 import android.util.Log
+import com.applovin.sdk.AppLovinMediationProvider
+import com.applovin.sdk.AppLovinSdk
+import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.example.globaldemo.configuration.ApplicationConfiguration
 import com.kwai.network.sdk.KwaiAdSDK
 import com.kwai.network.sdk.api.KwaiInitCallback
@@ -36,11 +39,29 @@ class AdUseCase {
                 .setAppId(ApplicationConfiguration.AD_BIGO_APP_ID)
                 .setDebug(true)
                 .build()
-            BigoAdSdk.initialize(
-                context, config
-            ) {
+            BigoAdSdk.initialize(context, config) {
                 Log.d(TAG, "initBigoAd() called with initialized")
             }
+        }
+
+        fun initMaxAd(context: Context) {
+            // Create the initialization configuration
+            val initConfig = AppLovinSdkInitializationConfiguration.builder(
+                ApplicationConfiguration.AD_MAX_KEY,
+                context
+            )
+                .setMediationProvider(AppLovinMediationProvider.MAX)
+                // Perform any additional configuration/setting changes
+                .build()
+            AppLovinSdk.getInstance(context).initialize(initConfig) { sdkConfig ->
+                Log.d(TAG, "initMaxAd() called with: sdkConfig = $sdkConfig")
+                updateMaxAdUserSettings(context)
+            }
+        }
+
+        private fun updateMaxAdUserSettings(context: Context) {
+            val settings = AppLovinSdk.getInstance(context).settings
+            settings.userIdentifier = "this is a test user identifier"
         }
     }
 }

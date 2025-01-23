@@ -11,7 +11,8 @@ import com.kwai.network.sdk.loader.business.reward.data.KwaiRewardAdRequest
 import com.kwai.network.sdk.loader.business.reward.interf.IKwaiRewardAdListener
 import com.kwai.network.sdk.loader.common.interf.AdLoadListener
 
-class KwaiAdController : AdController {
+class KwaiAdController(override val activity: Activity) : AdController {
+    override val adPlatform: AdPlatform = AdPlatform.KWAI
     private var rewardAd: KwaiRewardAd? = null
     override fun loadInterstitialAd() {
 
@@ -71,7 +72,7 @@ class KwaiAdController : AdController {
     override fun showInterstitialAd() {
     }
 
-    override fun showRewardVideoAd(activity: Activity) {
+    override fun showRewardVideoAd() {
         if (rewardAd != null && rewardAd!!.isReady) {
             rewardAd!!.show(activity)
         }

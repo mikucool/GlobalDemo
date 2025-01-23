@@ -9,6 +9,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven { url = uri("https://artifacts.applovin.com/android") }
     }
 }
 dependencyResolutionManagement {

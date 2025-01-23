@@ -12,6 +12,7 @@ class GlobalDemoApplication : Application() {
         lateinit var container: AppContainer
             private set
     }
+
     override fun onCreate() {
         super.onCreate()
         container = DefaultAppContainer(this)
@@ -21,6 +22,7 @@ class GlobalDemoApplication : Application() {
     private fun initSdk() {
         AdUseCase.initKwaiAd(this)
         AdUseCase.initBigoAd(this)
+        AdUseCase.initMaxAd(this)
         ThinkingDataUtil.initThinkingDataAnalytics(this)
         SMUtil.initSM(this)
     }

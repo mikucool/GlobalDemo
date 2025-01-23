@@ -2,7 +2,11 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+//    id("applovin-quality-service")
 }
+/*applovin {
+    apiKey = "qWSEfQRhBblNPZKpX0Ikm5pk8K3XiUFmAdTwLLitAgT-nZdIMIqoN2-RpCdO0qTocL5Nd3KL04gddZQnszhiH-"
+}*/
 
 android {
     namespace = "com.example.globaldemo"
@@ -78,6 +82,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    // compose view-model
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     // retrofit2
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
@@ -90,7 +96,9 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.appcompat)
     // bigo
-    implementation("com.bigossp:bigo-ads:5.1.0")
+    implementation(libs.bigo.ads)
+    // max
+    implementation(libs.applovin.sdk)
     // thinking data
     implementation(libs.thinkinganalyticssdk)
     // 数盟

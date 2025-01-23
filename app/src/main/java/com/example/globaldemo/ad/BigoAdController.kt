@@ -10,8 +10,9 @@ import sg.bigo.ads.api.RewardVideoAd
 import sg.bigo.ads.api.RewardVideoAdLoader
 import sg.bigo.ads.api.RewardVideoAdRequest
 
-class BigoAdController : AdController {
+class BigoAdController(override val activity: Activity) : AdController {
     private var rewardAd: RewardVideoAd? = null
+    override val adPlatform: AdPlatform = AdPlatform.BIGO
     override fun loadInterstitialAd() {}
 
     override fun loadRewardVideoAd() {
@@ -36,7 +37,7 @@ class BigoAdController : AdController {
     override fun showInterstitialAd() {
     }
 
-    override fun showRewardVideoAd(activity: Activity) {
+    override fun showRewardVideoAd() {
         if (rewardAd != null && !rewardAd!!.isExpired) {
             rewardAd!!.setAdInteractionListener(object : RewardAdInteractionListener{
                 override fun onAdError(p0: AdError) {

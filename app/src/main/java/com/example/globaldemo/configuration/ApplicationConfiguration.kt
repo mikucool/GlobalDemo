@@ -4,10 +4,11 @@ object ApplicationConfiguration {
     const val AD_KWAI_APP_ID = "899999"
     const val AD_KWAI_TOKEN = "EaCw0AipSYyvf3E7"
     const val AD_KWAI_REWARD_ID = "8999996001"
-    const val AD_KWAI_INTERSTITIAL_ID = "8999996002"
 
     const val AD_BIGO_APP_ID = "10182906"
     const val AD_BIGO_REWARD_ID = "10182906-10017534"
+
+    const val AD_MAX_KEY = "tRLgvBNKtFZuwWs2XqXJt_3X9yyl7oCA-1N-LBASDS9GDGrDaMunCbzHMWK63bVl_NmwB5g0k5sCUD6BAEgmda"
 
     const val THINKING_DATA_APP_ID = "a511b1353d7947118d237d676f9d74f4"
     const val THINKING_DATA_SERVER_URL = "http://shu.booksgoo.com"
