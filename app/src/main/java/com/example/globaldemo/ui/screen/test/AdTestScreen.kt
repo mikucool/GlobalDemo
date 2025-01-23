@@ -1,4 +1,4 @@
-package com.example.globaldemo.ui.screen.ad
+package com.example.globaldemo.ui.screen.test
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

@@ -1,4 +1,4 @@
-package com.example.globaldemo.ui.screen.ad
+package com.example.globaldemo.ui.screen.test
 
 import androidx.lifecycle.ViewModel
 import com.example.globaldemo.ad.AdController

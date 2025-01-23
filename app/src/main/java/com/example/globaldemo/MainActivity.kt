@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentActivity
 import com.example.globaldemo.ad.BigoAdController
 import com.example.globaldemo.ad.KwaiAdController
 import com.example.globaldemo.ad.MaxAdController
-import com.example.globaldemo.ui.screen.ad.AdTestScreen
+import com.example.globaldemo.ui.screen.test.AdTestScreen
 import com.example.globaldemo.ui.theme.GlobalDemoTheme
 
 class MainActivity : FragmentActivity() {
