@@ -18,7 +18,7 @@ class KwaiAdController(override val activity: Activity) : AdController {
 
     }
 
-    override fun loadRewardVideoAd() {
+    override fun loadRewardVideoAd(callback: RewardAdCallback) {
         val loaderManager = KwaiAdSDK.getKwaiAdLoaderManager()
         if (loaderManager != null) {
             val loader = loaderManager.buildRewardAdLoader(
@@ -30,28 +30,34 @@ class KwaiAdController(override val activity: Activity) : AdController {
 
                         override fun onAdLoadFailed(p0: String?, p1: KwaiError) {
                             Log.d(TAG, "onAdLoadFailed() called with: p0 = $p0, p1 = $p1")
+                            callback.onFailedToLoad()
                         }
 
                         override fun onAdLoadSuccess(p0: String?, p1: KwaiRewardAd) {
                             rewardAd = p1
                             Log.d(TAG, "onAdLoadSuccess() called with: p0 = $p0, p1 = $p1")
+                            callback.onLoaded()
                         }
                     })
                     .withKwaiRewardAdListener(object : IKwaiRewardAdListener {
                         override fun onAdShow() {
                             Log.d(TAG, "onAdShow() called")
+                            callback.onDisplayed()
                         }
 
                         override fun onAdShowFailed(p0: KwaiError) {
                             Log.d(TAG, "onAdShowFailed() called with: p0 = $p0")
+                            callback.onFailedToDisplay()
                         }
 
                         override fun onAdClick() {
                             Log.d(TAG, "onAdClick() called")
+                            callback.onClicked()
                         }
 
                         override fun onAdClose() {
                             Log.d(TAG, "onAdClose() called")
+                            callback.onClosed()
                         }
 
                         override fun onAdPlayComplete() {
@@ -60,6 +66,7 @@ class KwaiAdController(override val activity: Activity) : AdController {
 
                         override fun onRewardEarned() {
                             Log.d(TAG, "onRewardEarned() called")
+                            callback.onRewarded()
                         }
                     })
                     .build()

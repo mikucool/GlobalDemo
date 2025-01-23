@@ -15,7 +15,7 @@ class BigoAdController(override val activity: Activity) : AdController {
     override val adPlatform: AdPlatform = AdPlatform.BIGO
     override fun loadInterstitialAd() {}
 
-    override fun loadRewardVideoAd() {
+    override fun loadRewardVideoAd(callback: RewardAdCallback) {
         val request = RewardVideoAdRequest.Builder()
             .withSlotId(ApplicationConfiguration.AD_BIGO_REWARD_ID)
             .build()
@@ -23,11 +23,44 @@ class BigoAdController(override val activity: Activity) : AdController {
             .withAdLoadListener(object : AdLoadListener<RewardVideoAd> {
                 override fun onError(p0: AdError) {
                     Log.d(TAG, "onError() called with: p0 = $p0")
+                    callback.onFailedToLoad()
                 }
 
                 override fun onAdLoaded(p0: RewardVideoAd) {
                     Log.d(TAG, "onAdLoaded() called with: p0 = ${p0.bid?.price}")
                     rewardAd = p0
+                    rewardAd?.setAdInteractionListener(object : RewardAdInteractionListener{
+                        override fun onAdError(p0: AdError) {
+                            Log.d(TAG, "onAdError() called with: p0 = $p0")
+                            callback.onFailedToDisplay()
+                        }
+
+                        override fun onAdImpression() {
+                            Log.d(TAG, "onAdImpression() called")
+                            callback.onDisplayed()
+                        }
+
+                        override fun onAdClicked() {
+                            Log.d(TAG, "onAdClicked() called")
+                            callback.onClicked()
+                        }
+
+                        override fun onAdOpened() {
+                            Log.d(TAG, "onAdOpened() called")
+                            callback.onOpened()
+                        }
+
+                        override fun onAdClosed() {
+                            Log.d(TAG, "onAdClosed() called")
+                            callback.onClosed()
+                        }
+
+                        override fun onAdRewarded() {
+                            Log.d(TAG, "onAdRewarded() called")
+                            callback.onRewarded()
+                        }
+                    })
+                    callback.onLoaded()
                 }
             })
             .build()
@@ -39,31 +72,6 @@ class BigoAdController(override val activity: Activity) : AdController {
 
     override fun showRewardVideoAd() {
         if (rewardAd != null && !rewardAd!!.isExpired) {
-            rewardAd!!.setAdInteractionListener(object : RewardAdInteractionListener{
-                override fun onAdError(p0: AdError) {
-                    Log.d(TAG, "onAdError() called with: p0 = $p0")
-                }
-
-                override fun onAdImpression() {
-                    Log.d(TAG, "onAdImpression() called")
-                }
-
-                override fun onAdClicked() {
-                    Log.d(TAG, "onAdClicked() called")
-                }
-
-                override fun onAdOpened() {
-                    Log.d(TAG, "onAdOpened() called")
-                }
-
-                override fun onAdClosed() {
-                    Log.d(TAG, "onAdClosed() called")
-                }
-
-                override fun onAdRewarded() {
-                    Log.d(TAG, "onAdRewarded() called")
-                }
-            })
             rewardAd!!.show(activity)
         }
     }
