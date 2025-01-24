@@ -9,7 +9,7 @@ import com.example.globaldemo.ad.constant.RewardAdState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class AdTestViewModel : ViewModel() {
+class AdPlatformTestViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(AdTestUiState())
     val uiState: StateFlow<AdTestUiState> = _uiState
 

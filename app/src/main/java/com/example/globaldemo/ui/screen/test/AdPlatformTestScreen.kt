@@ -27,10 +27,10 @@ import com.example.globaldemo.ad.controller.BiddingAdController
 import com.example.globaldemo.ad.constant.RewardAdState
 
 @Composable
-fun AdTestScreen(
+fun AdPlatformTestScreen(
     modifier: Modifier = Modifier,
     biddingAdControllers: List<BiddingAdController> = emptyList(),
-    viewModel: AdTestViewModel = viewModel()
+    viewModel: AdPlatformTestViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val state = viewModel.uiState.collectAsState()
@@ -97,5 +97,5 @@ fun AdTestScreen(
 @Preview(showBackground = true)
 @Composable
 fun AdTestScreenPreview() {
-    AdTestScreen()
+    AdPlatformTestScreen()
 }

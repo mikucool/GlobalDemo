@@ -12,7 +12,7 @@ import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.ad.controller.BigoBiddingAdController
 import com.example.globaldemo.ad.controller.KwaiBiddingAdController
 import com.example.globaldemo.ad.controller.MaxBiddingAdController
-import com.example.globaldemo.ui.screen.test.AdTestScreen
+import com.example.globaldemo.ui.screen.test.AdPlatformTestScreen
 import com.example.globaldemo.ui.theme.GlobalDemoTheme
 import kotlinx.coroutines.runBlocking
 
@@ -26,7 +26,7 @@ class MainActivity : FragmentActivity() {
         enableEdgeToEdge()
         setContent {
             GlobalDemoTheme {
-                AdTestScreen(
+                AdPlatformTestScreen(
                     modifier = Modifier.fillMaxSize(),
                     biddingAdControllers = controllers
                 )
