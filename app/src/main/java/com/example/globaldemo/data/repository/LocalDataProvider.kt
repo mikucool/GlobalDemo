@@ -1,7 +1,7 @@
-package com.example.globaldemo.data
+package com.example.globaldemo.data.repository
 
-import com.example.globaldemo.ad.AdPlatform
-import com.example.globaldemo.ad.AdType
+import com.example.globaldemo.ad.constant.AdPlatform
+import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.configuration.ApplicationConfiguration
 import com.example.globaldemo.model.AdConfiguration
 

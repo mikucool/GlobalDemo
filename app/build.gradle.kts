@@ -83,7 +83,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     // compose view-model
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    // kotlin coroutines
+    implementation("kotlinx.coroutines:kotlinx-coroutines-core:1.6.4")
     // retrofit2
     implementation(libs.retrofit)
     implementation(libs.converter.gson)

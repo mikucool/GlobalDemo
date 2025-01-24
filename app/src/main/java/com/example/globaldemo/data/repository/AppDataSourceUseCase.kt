@@ -1,6 +1,6 @@
-package com.example.globaldemo.data
+package com.example.globaldemo.data.repository
 
-import com.example.globaldemo.ad.AdPlatform
+import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.model.AdConfiguration
 
 class AppDataSourceUseCase {

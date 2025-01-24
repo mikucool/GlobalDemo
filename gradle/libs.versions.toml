@@ -25,6 +25,7 @@ adapi = { module = "io.github.kwainetwork:adApi", version.ref = "adapi" }
 adimpl = { module = "io.github.kwainetwork:adImpl", version.ref = "adapi" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3Exoplayer" }
 applovin-sdk = { module = "com.applovin:applovin-sdk", version.ref = "applovinSdk" }
 bigo-ads = { module = "com.bigossp:bigo-ads", version.ref = "bigoAds" }

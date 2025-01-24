@@ -1,7 +1,7 @@
 package com.example.globaldemo
 
 import android.app.Application
-import com.example.globaldemo.ad.AdUseCase
+import com.example.globaldemo.ad.AdSdkInitializer
 import com.example.globaldemo.analysis.ThinkingDataUtil
 import com.example.globaldemo.data.AppContainer
 import com.example.globaldemo.data.DefaultAppContainer
@@ -23,9 +23,9 @@ class GlobalDemoApplication : Application() {
     }
 
     private fun initSdk() {
-        AdUseCase.initKwaiAd(this)
-        AdUseCase.initBigoAd(this)
-        AdUseCase.initMaxAd(this)
+        AdSdkInitializer.initKwaiAd(this)
+        AdSdkInitializer.initBigoAd(this)
+        AdSdkInitializer.initMaxAd(this)
         ThinkingDataUtil.initThinkingDataAnalytics(this)
         SMUtil.initSM(this)
     }

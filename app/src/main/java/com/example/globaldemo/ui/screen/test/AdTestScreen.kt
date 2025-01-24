@@ -23,8 +23,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.globaldemo.ad.BiddingAdController
-import com.example.globaldemo.ad.RewardAdState
+import com.example.globaldemo.ad.controller.BiddingAdController
+import com.example.globaldemo.ad.constant.RewardAdState
 
 @Composable
 fun AdTestScreen(

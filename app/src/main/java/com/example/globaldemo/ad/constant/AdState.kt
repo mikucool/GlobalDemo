@@ -1,4 +1,4 @@
-package com.example.globaldemo.ad
+package com.example.globaldemo.ad.constant
 
 enum class RewardAdState {
     DEFAULT,

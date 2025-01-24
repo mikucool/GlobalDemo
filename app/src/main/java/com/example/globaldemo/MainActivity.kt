@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import com.example.globaldemo.GlobalDemoApplication.Companion.container
-import com.example.globaldemo.ad.BiddingAdController
-import com.example.globaldemo.ad.AdPlatform
-import com.example.globaldemo.ad.BigoBiddingAdController
-import com.example.globaldemo.ad.KwaiBiddingAdController
-import com.example.globaldemo.ad.MaxBiddingAdController
+import com.example.globaldemo.ad.controller.BiddingAdController
+import com.example.globaldemo.ad.constant.AdPlatform
+import com.example.globaldemo.ad.controller.BigoBiddingAdController
+import com.example.globaldemo.ad.controller.KwaiBiddingAdController
+import com.example.globaldemo.ad.controller.MaxBiddingAdController
 import com.example.globaldemo.ui.screen.test.AdTestScreen
 import com.example.globaldemo.ui.theme.GlobalDemoTheme
 import kotlinx.coroutines.runBlocking

@@ -1,6 +1,8 @@
 package com.example.globaldemo.data
 
 import android.content.Context
+import com.example.globaldemo.data.repository.AppDataSourceUseCase
+import com.example.globaldemo.data.repository.UserPreferencesUseCase
 
 interface AppContainer {
     val appDataSourceUseCase: AppDataSourceUseCase

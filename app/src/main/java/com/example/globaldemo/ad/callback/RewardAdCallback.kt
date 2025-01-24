@@ -1,4 +1,4 @@
-package com.example.globaldemo.ad
+package com.example.globaldemo.ad.callback
 
 interface RewardAdCallback {
     fun onLoaded() = run { }

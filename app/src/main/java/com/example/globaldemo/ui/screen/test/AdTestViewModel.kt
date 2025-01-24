@@ -2,10 +2,10 @@ package com.example.globaldemo.ui.screen.test
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.example.globaldemo.ad.BiddingAdController
-import com.example.globaldemo.ad.AdPlatform
-import com.example.globaldemo.ad.RewardAdCallback
-import com.example.globaldemo.ad.RewardAdState
+import com.example.globaldemo.ad.controller.BiddingAdController
+import com.example.globaldemo.ad.constant.AdPlatform
+import com.example.globaldemo.ad.callback.RewardAdCallback
+import com.example.globaldemo.ad.constant.RewardAdState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

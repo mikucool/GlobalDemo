@@ -1,7 +1,7 @@
 package com.example.globaldemo.model
 
-import com.example.globaldemo.ad.AdPlatform
-import com.example.globaldemo.ad.AdType
+import com.example.globaldemo.ad.constant.AdPlatform
+import com.example.globaldemo.ad.constant.AdType
 
 /**
  * @param adPlatform Ad平台

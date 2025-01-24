@@ -1,4 +1,4 @@
-package com.example.globaldemo.ad
+package com.example.globaldemo.ad.controller
 
 import android.app.Activity
 import android.content.Context
@@ -8,6 +8,8 @@ import com.applovin.mediation.MaxError
 import com.applovin.mediation.MaxReward
 import com.applovin.mediation.MaxRewardedAdListener
 import com.applovin.mediation.ads.MaxRewardedAd
+import com.example.globaldemo.ad.constant.AdType
+import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.model.AdConfiguration
 
 class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : BiddingAdController {
