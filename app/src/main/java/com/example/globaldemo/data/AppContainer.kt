@@ -3,11 +3,15 @@ package com.example.globaldemo.data
 import android.content.Context
 
 interface AppContainer {
-    val userPreferencesRepository: UserPreferencesRepository
+    val appDataSourceUseCase: AppDataSourceUseCase
+    val userPreferencesUseCase: UserPreferencesUseCase
 }
 
 class DefaultAppContainer(context: Context) : AppContainer {
-    override val userPreferencesRepository: UserPreferencesRepository by lazy {
-        UserPreferencesRepository(context.dataStore)
+    override val appDataSourceUseCase: AppDataSourceUseCase by lazy {
+        AppDataSourceUseCase()
+    }
+    override val userPreferencesUseCase: UserPreferencesUseCase by lazy {
+        UserPreferencesUseCase(context)
     }
 }

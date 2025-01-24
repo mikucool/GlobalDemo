@@ -48,11 +48,11 @@ object ThinkingDataUtil {
     }
 
     private suspend fun hasSetDistinctId(): Boolean {
-        return GlobalDemoApplication.container.userPreferencesRepository.hasSetDistinctId.first()
+        return GlobalDemoApplication.container.userPreferencesUseCase.hasSetDistinctId.first()
     }
 
     private suspend fun updateHasSetDistinctId(hasSetDistinctId: Boolean) {
-        GlobalDemoApplication.container.userPreferencesRepository.updateHasSetDistinctId(
+        GlobalDemoApplication.container.userPreferencesUseCase.updateHasSetDistinctId(
             hasSetDistinctId
         )
     }

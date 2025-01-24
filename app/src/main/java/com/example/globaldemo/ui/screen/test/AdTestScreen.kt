@@ -21,13 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.globaldemo.ad.AdController
+import com.example.globaldemo.ad.BiddingAdController
 import com.example.globaldemo.ad.RewardAdState
 
 @Composable
 fun AdTestScreen(
     modifier: Modifier = Modifier,
-    adControllers: List<AdController> = emptyList(),
+    biddingAdControllers: List<BiddingAdController> = emptyList(),
     viewModel: AdTestViewModel = viewModel()
 ) {
     val state = viewModel.uiState.collectAsState()
@@ -49,19 +49,19 @@ fun AdTestScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                adControllers.forEach { adController ->
+                biddingAdControllers.forEach { adController ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.toggleable(
-                            value = state.value.adPlatform == adController.adPlatform,
+                            value = state.value.adPlatform == adController.adConfiguration.adPlatform,
                             enabled = true,
-                            onValueChange = { viewModel.updateAdPlatform(adController.adPlatform) })
+                            onValueChange = { viewModel.updateAdPlatform(adController.adConfiguration.adPlatform) })
                     ) {
                         RadioButton(
-                            selected = state.value.adPlatform == adController.adPlatform,
-                            onClick = { viewModel.updateAdPlatform(adController.adPlatform) }
+                            selected = state.value.adPlatform == adController.adConfiguration.adPlatform,
+                            onClick = { viewModel.updateAdPlatform(adController.adConfiguration.adPlatform) }
                         )
-                        Text(text = adController.adPlatform.name)
+                        Text(text = adController.adConfiguration.adPlatform.name)
                     }
                 }
             }
@@ -72,7 +72,7 @@ fun AdTestScreen(
                 Button(
                     onClick = {
                         val controller =
-                            adControllers.find { it.adPlatform == state.value.adPlatform }
+                            biddingAdControllers.find { it.adConfiguration.adPlatform == state.value.adPlatform }
                         controller?.let { viewModel.loadAd(it) }
                     },
                     shape = CircleShape
@@ -81,8 +81,8 @@ fun AdTestScreen(
                 }
 
                 Button(onClick = {
-                    val controller = adControllers.find { it.adPlatform == state.value.adPlatform }
-                    controller?.showRewardVideoAd()
+                    val controller = biddingAdControllers.find { it.adConfiguration.adPlatform == state.value.adPlatform }
+                    controller?.displayHighestRevenueRewardVideoAd()
                 }) {
                     Text(text = "Show Ad")
                 }

@@ -1,7 +1,7 @@
 package com.example.globaldemo.ui.screen.test
 
 import androidx.lifecycle.ViewModel
-import com.example.globaldemo.ad.AdController
+import com.example.globaldemo.ad.BiddingAdController
 import com.example.globaldemo.ad.AdPlatform
 import com.example.globaldemo.ad.RewardAdCallback
 import com.example.globaldemo.ad.RewardAdState
@@ -20,9 +20,9 @@ class AdTestViewModel : ViewModel() {
         _uiState.value = AdTestUiState(uiState.value.adPlatform, rewardAdState)
     }
 
-    fun loadAd(adController: AdController) {
+    fun loadAd(biddingAdController: BiddingAdController) {
         updateRewardAdState(RewardAdState.LOADING)
-        adController.loadRewardVideoAd(object : RewardAdCallback {
+        biddingAdController.loadRewardVideoAds(object : RewardAdCallback {
             override fun onLoaded() {
                 super.onLoaded()
                 updateRewardAdState(RewardAdState.LOADED)

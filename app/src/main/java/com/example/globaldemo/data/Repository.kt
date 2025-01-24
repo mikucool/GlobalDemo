@@ -7,8 +7,27 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.globaldemo.ad.AdPlatform
+import com.example.globaldemo.model.AdConfiguration
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+
+interface AppRepository {
+    suspend fun fetchAdConfigurationByAdPlatform(adPlatform: AdPlatform): AdConfiguration
+}
+
+class RemoteAppRepository : AppRepository {
+    override suspend fun fetchAdConfigurationByAdPlatform(adPlatform: AdPlatform): AdConfiguration {
+        return AdConfiguration()
+    }
+
+}
+
+class LocalAppRepository : AppRepository {
+    override suspend fun fetchAdConfigurationByAdPlatform(adPlatform: AdPlatform): AdConfiguration =
+        LocalDataProvider.fetchAdConfigurationByAdPlatform(adPlatform)
+
+}
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
@@ -23,8 +42,7 @@ class UserPreferencesRepository(private val dataStore: DataStore<Preferences>) {
             preferences[PreferencesKeys.CUSTOM_ID] ?: ""
         }
     val hasSetDistinctId: Flow<Boolean> = dataStore.data
-        .map {
-            preferences ->
+        .map { preferences ->
             preferences[PreferencesKeys.HAS_SET_DISTINCT_ID] ?: false
         }
 
