@@ -1,5 +1,6 @@
 package com.example.globaldemo.ad
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
 import com.applovin.sdk.AppLovinMediationProvider
@@ -12,7 +13,12 @@ import com.kwai.network.sdk.api.SdkConfig
 import sg.bigo.ads.BigoAdSdk
 import sg.bigo.ads.api.AdConfig
 
-class AdUseCase {
+/**
+ * do ad business logic here
+ */
+class AdUseCase(private val activity: Activity) {
+
+
     companion object {
         const val TAG = "AdUseCase"
         fun initKwaiAd(context: Context) {

@@ -37,15 +37,12 @@ class MainActivity : FragmentActivity() {
     private suspend fun getAdControllers(): List<BiddingAdController> {
         val appDataSourceUseCase = container.appDataSourceUseCase
         val bigoAdController = BigoBiddingAdController(
-            this,
             appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.BIGO)
         )
         val kwaiAdController = KwaiBiddingAdController(
-            this,
             appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.KWAI)
         )
         val maxAdController = MaxBiddingAdController(
-            this,
             appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.MAX)
         )
         return listOf(bigoAdController, kwaiAdController, maxAdController)

@@ -1,6 +1,7 @@
 package com.example.globaldemo.ad
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import com.applovin.mediation.MaxAd
 import com.applovin.mediation.MaxError
@@ -9,11 +10,8 @@ import com.applovin.mediation.MaxRewardedAdListener
 import com.applovin.mediation.ads.MaxRewardedAd
 import com.example.globaldemo.model.AdConfiguration
 
-class MaxBiddingAdController(
-    override val activity: Activity,
-    override val adConfiguration: AdConfiguration
-) : BiddingAdController {
-    private val rewardAdsMap: MutableMap<String, MaxAd?> by lazy {
+class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : BiddingAdController {
+    private val rewardAdsMap: MutableMap<String, MaxRewardAdWrapper?> by lazy {
         (adConfiguration.adIdListMap[AdType.REWARD] ?: emptyList())
             .associateWith { null }
             .toMutableMap()
@@ -22,13 +20,13 @@ class MaxBiddingAdController(
     override fun loadInterstitialAds() {
     }
 
-    override fun loadRewardVideoAds(callback: RewardAdCallback) {
+    override fun loadRewardVideoAds(context: Context, callback: RewardAdCallback) {
         rewardAdsMap.forEach { (adId, rewardAd) ->
             if (rewardAd == null) {
-                val rewardedAd = MaxRewardedAd.getInstance(adId, activity)
+                val rewardedAd = MaxRewardedAd.getInstance(adId, context)
                 rewardedAd.setListener(object : MaxRewardedAdListener {
                     override fun onAdLoaded(p0: MaxAd) {
-                        rewardAdsMap[adId] = p0
+                        rewardAdsMap[adId] = MaxRewardAdWrapper(rewardedAd, p0.revenue)
                         Log.d(TAG, "onAdLoaded() called with: p0 = $p0")
                         callback.onLoaded()
                     }
@@ -70,8 +68,9 @@ class MaxBiddingAdController(
     override fun displayHighestRevenueInterstitialAd() {
     }
 
-    override fun displayHighestRevenueRewardVideoAd() {
-
+    override fun displayHighestRevenueRewardVideoAd(activity: Activity) {
+        val rewardAdWrapper = rewardAdsMap.values.filterNotNull().maxByOrNull { it.revenue }
+        rewardAdWrapper?.ad?.showAd(activity)
     }
 
     override fun getHighestRewardAdRevenue(): Double {
@@ -85,5 +84,10 @@ class MaxBiddingAdController(
     companion object {
         const val TAG = "MaxBiddingAdController"
     }
+
+    private data class MaxRewardAdWrapper(
+        val ad: MaxRewardedAd,
+        val revenue: Double
+    )
 
 }

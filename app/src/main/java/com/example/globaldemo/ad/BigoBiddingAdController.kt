@@ -1,6 +1,7 @@
 package com.example.globaldemo.ad
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import com.example.globaldemo.model.AdConfiguration
 import sg.bigo.ads.api.AdError
@@ -10,10 +11,7 @@ import sg.bigo.ads.api.RewardVideoAd
 import sg.bigo.ads.api.RewardVideoAdLoader
 import sg.bigo.ads.api.RewardVideoAdRequest
 
-class BigoBiddingAdController(
-    override val activity: Activity,
-    override val adConfiguration: AdConfiguration
-) : BiddingAdController {
+class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : BiddingAdController {
     override fun loadInterstitialAds() {}
 
     private val rewardAdsMap: MutableMap<String, RewardVideoAd?> by lazy {
@@ -22,8 +20,11 @@ class BigoBiddingAdController(
             .toMutableMap()
     }
 
-    override fun loadRewardVideoAds(callback: RewardAdCallback) {
-        Log.i(TAG, "loadRewardVideoAds() called with: callback = $callback, adConfiguration = $adConfiguration")
+    override fun loadRewardVideoAds(context: Context, callback: RewardAdCallback) {
+        Log.i(
+            TAG,
+            "loadRewardVideoAds() called with: callback = $callback, adConfiguration = $adConfiguration"
+        )
         rewardAdsMap.forEach { (adId, rewardAd) ->
             if (rewardAd == null) {
                 val request = RewardVideoAdRequest.Builder()
@@ -85,7 +86,7 @@ class BigoBiddingAdController(
     override fun displayHighestRevenueInterstitialAd() {
     }
 
-    override fun displayHighestRevenueRewardVideoAd() {
+    override fun displayHighestRevenueRewardVideoAd(activity: Activity) {
         val rewardAd = rewardAdsMap.values.filterNotNull().maxByOrNull { it.bid?.price ?: 0.0 }
         rewardAd?.show(activity)
     }

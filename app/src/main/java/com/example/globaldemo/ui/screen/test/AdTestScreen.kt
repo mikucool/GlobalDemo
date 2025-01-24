@@ -1,5 +1,6 @@
 package com.example.globaldemo.ui.screen.test
 
+import android.app.Activity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,6 +32,7 @@ fun AdTestScreen(
     biddingAdControllers: List<BiddingAdController> = emptyList(),
     viewModel: AdTestViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     val state = viewModel.uiState.collectAsState()
     if (state.value.rewardAdState == RewardAdState.LOADING) {
         Box(modifier = modifier.fillMaxSize()) {
@@ -73,7 +76,7 @@ fun AdTestScreen(
                     onClick = {
                         val controller =
                             biddingAdControllers.find { it.adConfiguration.adPlatform == state.value.adPlatform }
-                        controller?.let { viewModel.loadAd(it) }
+                        controller?.let { viewModel.loadAd(context, it) }
                     },
                     shape = CircleShape
                 ) {
@@ -82,7 +85,7 @@ fun AdTestScreen(
 
                 Button(onClick = {
                     val controller = biddingAdControllers.find { it.adConfiguration.adPlatform == state.value.adPlatform }
-                    controller?.displayHighestRevenueRewardVideoAd()
+                    controller?.displayHighestRevenueRewardVideoAd(context as Activity)
                 }) {
                     Text(text = "Show Ad")
                 }

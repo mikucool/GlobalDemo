@@ -9,12 +9,15 @@ import com.example.globaldemo.identifier.SMUtil
 
 class GlobalDemoApplication : Application() {
     companion object {
+        lateinit var instance: GlobalDemoApplication
+            private set
         lateinit var container: AppContainer
             private set
     }
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
         container = DefaultAppContainer(this)
         initSdk()
     }

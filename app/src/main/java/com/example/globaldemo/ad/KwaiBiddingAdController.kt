@@ -1,6 +1,7 @@
 package com.example.globaldemo.ad
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import com.example.globaldemo.configuration.ApplicationConfiguration
 import com.example.globaldemo.model.AdConfiguration
@@ -12,10 +13,7 @@ import com.kwai.network.sdk.loader.business.reward.data.KwaiRewardAdRequest
 import com.kwai.network.sdk.loader.business.reward.interf.IKwaiRewardAdListener
 import com.kwai.network.sdk.loader.common.interf.AdLoadListener
 
-class KwaiBiddingAdController(
-    override val activity: Activity,
-    override val adConfiguration: AdConfiguration
-) : BiddingAdController {
+class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : BiddingAdController {
 
     private val rewardAdsMap: MutableMap<String, KwaiRewardAd?> by lazy {
         (adConfiguration.adIdListMap[AdType.REWARD] ?: emptyList())
@@ -27,7 +25,7 @@ class KwaiBiddingAdController(
 
     }
 
-    override fun loadRewardVideoAds(callback: RewardAdCallback) {
+    override fun loadRewardVideoAds(context: Context, callback: RewardAdCallback) {
         rewardAdsMap.forEach { (adId, rewardAd) ->
             if (rewardAd == null) {
                 val loaderManager = KwaiAdSDK.getKwaiAdLoaderManager()
@@ -95,7 +93,7 @@ class KwaiBiddingAdController(
     override fun displayHighestRevenueInterstitialAd() {
     }
 
-    override fun displayHighestRevenueRewardVideoAd() {
+    override fun displayHighestRevenueRewardVideoAd(activity: Activity) {
         val rewardAd =
             rewardAdsMap.values.filterNotNull().maxByOrNull { it.price.toDoubleOrNull() ?: 0.0 }
         rewardAd?.show(activity)

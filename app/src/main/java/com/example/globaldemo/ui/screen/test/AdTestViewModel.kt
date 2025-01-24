@@ -1,5 +1,6 @@
 package com.example.globaldemo.ui.screen.test
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.example.globaldemo.ad.BiddingAdController
 import com.example.globaldemo.ad.AdPlatform
@@ -13,16 +14,16 @@ class AdTestViewModel : ViewModel() {
     val uiState: StateFlow<AdTestUiState> = _uiState
 
     fun updateAdPlatform(adPlatform: AdPlatform) {
-        _uiState.value = AdTestUiState(adPlatform)
+        _uiState.value = _uiState.value.copy(adPlatform = adPlatform)
     }
 
     private fun updateRewardAdState(rewardAdState: RewardAdState) {
-        _uiState.value = AdTestUiState(uiState.value.adPlatform, rewardAdState)
+        _uiState.value = _uiState.value.copy(rewardAdState = rewardAdState)
     }
 
-    fun loadAd(biddingAdController: BiddingAdController) {
+    fun loadAd(context: Context, biddingAdController: BiddingAdController) {
         updateRewardAdState(RewardAdState.LOADING)
-        biddingAdController.loadRewardVideoAds(object : RewardAdCallback {
+        biddingAdController.loadRewardVideoAds(context, object : RewardAdCallback {
             override fun onLoaded() {
                 super.onLoaded()
                 updateRewardAdState(RewardAdState.LOADED)
