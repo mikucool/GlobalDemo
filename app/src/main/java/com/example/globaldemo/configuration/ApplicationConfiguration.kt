@@ -14,8 +14,8 @@ object ApplicationConfiguration {
     const val AD_MAX_KEY = "tRLgvBNKtFZuwWs2XqXJt_3X9yyl7oCA-1N-LBASDS9GDGrDaMunCbzHMWK63bVl_NmwB5g0k5sCUD6BAEgmda"
     const val AD_MAX_REWARD_ID_1 = "c320a02a7bf5638a"
     const val AD_MAX_REWARD_ID_2 = "334fa2a00d17dcf4"
-    const val AD_MAX_INTERSTITIAL_ID_1 = "b0a32958b22b6e5b"
-    const val AD_MAX_INTERSTITIAL_ID_2 = "6e903df015c5c40a"
+    const val AD_MAX_INTERSTITIAL_ID_1 = "619f75501965fcec"
+    const val AD_MAX_INTERSTITIAL_ID_2 = "21f81e81c1ebafe7"
 
     const val THINKING_DATA_APP_ID = "a511b1353d7947118d237d676f9d74f4"
     const val THINKING_DATA_SERVER_URL = "http://shu.booksgoo.com"
