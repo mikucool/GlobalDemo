@@ -2,9 +2,11 @@ package com.example.globaldemo.ui.screen.test
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
+import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.controller.BiddingAdController
 import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.ad.callback.RewardAdCallback
+import com.example.globaldemo.ad.constant.InterstitialAdState
 import com.example.globaldemo.ad.constant.RewardAdState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +23,11 @@ class AdPlatformTestViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(rewardAdState = rewardAdState)
     }
 
-    fun loadAd(context: Context, biddingAdController: BiddingAdController) {
+    private fun updateInterstitialAdState(interstitialAdState: InterstitialAdState) {
+        _uiState.value = _uiState.value.copy(interstitialAdState = interstitialAdState)
+    }
+
+    fun loadRewardAd(context: Context, biddingAdController: BiddingAdController) {
         updateRewardAdState(RewardAdState.LOADING)
         biddingAdController.loadRewardVideoAds(context, object : RewardAdCallback {
             override fun onLoaded() {
@@ -57,8 +63,37 @@ class AdPlatformTestViewModel : ViewModel() {
 
     }
 
+    fun loadInterstitialAd(context: Context, biddingAdController: BiddingAdController) {
+        updateInterstitialAdState(InterstitialAdState.LOADING)
+        biddingAdController.loadInterstitialAds(context, object : InterstitialAdCallback {
+            override fun onLoaded() {
+                super.onLoaded()
+                updateInterstitialAdState(InterstitialAdState.LOADED)
+            }
+            override fun onFailedToLoad() {
+                super.onFailedToLoad()
+                updateInterstitialAdState(InterstitialAdState.LOAD_ERROR)
+            }
+            override fun onDisplayed() {
+                super.onDisplayed()
+                updateInterstitialAdState(InterstitialAdState.DISPLAYED)
+            }
+
+            override fun onFailedToDisplay() {
+                super.onFailedToDisplay()
+                updateInterstitialAdState(InterstitialAdState.DISPLAY_ERROR)
+            }
+
+            override fun onClosed() {
+                super.onClosed()
+                updateInterstitialAdState(InterstitialAdState.CLOSED)
+            }
+        })
+    }
+
     data class AdTestUiState(
         val adPlatform: AdPlatform = AdPlatform.MAX,
-        val rewardAdState: RewardAdState = RewardAdState.DEFAULT
+        val rewardAdState: RewardAdState = RewardAdState.DEFAULT,
+        val interstitialAdState: InterstitialAdState = InterstitialAdState.DEFAULT
     )
 }

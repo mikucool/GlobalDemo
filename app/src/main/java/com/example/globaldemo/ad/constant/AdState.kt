@@ -10,3 +10,13 @@ enum class RewardAdState {
     REWARDED,
     CLOSED
 }
+
+enum class InterstitialAdState {
+    DEFAULT,
+    LOADING,
+    LOAD_ERROR,
+    LOADED,
+    DISPLAYED,
+    DISPLAY_ERROR,
+    CLOSED
+}

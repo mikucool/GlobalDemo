@@ -7,13 +7,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import com.example.globaldemo.GlobalDemoApplication.Companion.container
+import com.example.globaldemo.ad.AdControllerFactory
 import com.example.globaldemo.ad.controller.BiddingAdController
 import com.example.globaldemo.ad.constant.AdPlatform
-import com.example.globaldemo.ad.controller.BigoBiddingAdController
-import com.example.globaldemo.ad.controller.KwaiBiddingAdController
-import com.example.globaldemo.ad.controller.MaxBiddingAdController
-import com.example.globaldemo.ui.screen.test.AdPlatformTestScreen
+import com.example.globaldemo.ui.screen.test.InterstitialAdPlatformTestScreen
+import com.example.globaldemo.ui.screen.test.RewardAdPlatformTestScreen
 import com.example.globaldemo.ui.theme.GlobalDemoTheme
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 
 class MainActivity : FragmentActivity() {
@@ -26,7 +28,7 @@ class MainActivity : FragmentActivity() {
         enableEdgeToEdge()
         setContent {
             GlobalDemoTheme {
-                AdPlatformTestScreen(
+                InterstitialAdPlatformTestScreen(
                     modifier = Modifier.fillMaxSize(),
                     biddingAdControllers = controllers
                 )
@@ -34,18 +36,15 @@ class MainActivity : FragmentActivity() {
         }
     }
 
-    private suspend fun getAdControllers(): List<BiddingAdController> {
+    private suspend fun getAdControllers(): List<BiddingAdController> = coroutineScope {
         val appDataSourceUseCase = container.appDataSourceUseCase
-        val bigoAdController = BigoBiddingAdController(
-            appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.BIGO)
+        val deferredConfigs = listOf(
+            async { appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.BIGO) },
+            async { appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.KWAI) },
+            async { appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.MAX) }
         )
-        val kwaiAdController = KwaiBiddingAdController(
-            appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.KWAI)
-        )
-        val maxAdController = MaxBiddingAdController(
-            appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.MAX)
-        )
-        return listOf(bigoAdController, kwaiAdController, maxAdController)
+        val adConfigurations = deferredConfigs.awaitAll()
+        return@coroutineScope AdControllerFactory.generateAdControllers(adConfigurations)
     }
 
 }

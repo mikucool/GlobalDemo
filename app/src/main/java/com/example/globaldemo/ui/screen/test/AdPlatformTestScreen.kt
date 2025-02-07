@@ -23,11 +23,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.globaldemo.ad.constant.InterstitialAdState
 import com.example.globaldemo.ad.controller.BiddingAdController
 import com.example.globaldemo.ad.constant.RewardAdState
 
 @Composable
-fun AdPlatformTestScreen(
+fun RewardAdPlatformTestScreen(
     modifier: Modifier = Modifier,
     biddingAdControllers: List<BiddingAdController> = emptyList(),
     viewModel: AdPlatformTestViewModel = viewModel()
@@ -76,18 +77,86 @@ fun AdPlatformTestScreen(
                     onClick = {
                         val controller =
                             biddingAdControllers.find { it.adConfiguration.adPlatform == state.value.adPlatform }
-                        controller?.let { viewModel.loadAd(context, it) }
+                        controller?.let { viewModel.loadRewardAd(context, it) }
                     },
                     shape = CircleShape
                 ) {
-                    Text(text = "Load Ad")
+                    Text(text = "Load Reward Ad")
                 }
 
                 Button(onClick = {
                     val controller = biddingAdControllers.find { it.adConfiguration.adPlatform == state.value.adPlatform }
                     controller?.displayHighestRevenueRewardVideoAd(context as Activity)
                 }) {
-                    Text(text = "Show Ad")
+                    Text(text = "Show Reward Ad")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun InterstitialAdPlatformTestScreen(
+    modifier: Modifier = Modifier,
+    biddingAdControllers: List<BiddingAdController> = emptyList(),
+    viewModel: AdPlatformTestViewModel = viewModel()
+) {
+    val context = LocalContext.current
+    val state = viewModel.uiState.collectAsState()
+    if (state.value.interstitialAdState == InterstitialAdState.LOADING) {
+        Box(modifier = modifier.fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+    } else {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Spacer(modifier = Modifier.weight(1f))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                biddingAdControllers.forEach { adController ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.toggleable(
+                            value = state.value.adPlatform == adController.adConfiguration.adPlatform,
+                            enabled = true,
+                            onValueChange = { viewModel.updateAdPlatform(adController.adConfiguration.adPlatform) })
+                    ) {
+                        RadioButton(
+                            selected = state.value.adPlatform == adController.adConfiguration.adPlatform,
+                            onClick = { viewModel.updateAdPlatform(adController.adConfiguration.adPlatform) }
+                        )
+                        Text(text = adController.adConfiguration.adPlatform.name)
+                    }
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    onClick = {
+                        val controller =
+                            biddingAdControllers.find { it.adConfiguration.adPlatform == state.value.adPlatform }
+                        controller?.let { viewModel.loadInterstitialAd(context, it) }
+                    },
+                    shape = CircleShape
+                ) {
+                    Text(text = "Load Interstitial Ad")
+                }
+
+                Button(onClick = {
+                    val controller = biddingAdControllers.find { it.adConfiguration.adPlatform == state.value.adPlatform }
+                    controller?.displayHighestRevenueInterstitialAd(context as Activity)
+                }) {
+                    Text(text = "Show Interstitial Ad")
                 }
             }
         }
@@ -97,5 +166,11 @@ fun AdPlatformTestScreen(
 @Preview(showBackground = true)
 @Composable
 fun AdTestScreenPreview() {
-    AdPlatformTestScreen()
+    RewardAdPlatformTestScreen()
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AdTestScreenPreview2() {
+    InterstitialAdPlatformTestScreen()
 }

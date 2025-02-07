@@ -3,6 +3,7 @@ package com.example.globaldemo.ad.controller
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.configuration.ApplicationConfiguration
@@ -22,8 +23,7 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
             .associateWith { null }
             .toMutableMap()
     }
-
-    override fun loadInterstitialAds() {
+    override fun loadInterstitialAds(context: Context, callback: InterstitialAdCallback) {
 
     }
 
@@ -92,7 +92,7 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
         }
     }
 
-    override fun displayHighestRevenueInterstitialAd() {
+    override fun displayHighestRevenueInterstitialAd(activity: Activity) {
     }
 
     override fun displayHighestRevenueRewardVideoAd(activity: Activity) {

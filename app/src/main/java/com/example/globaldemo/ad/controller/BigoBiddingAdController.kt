@@ -3,6 +3,7 @@ package com.example.globaldemo.ad.controller
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.model.AdConfiguration
@@ -14,7 +15,7 @@ import sg.bigo.ads.api.RewardVideoAdLoader
 import sg.bigo.ads.api.RewardVideoAdRequest
 
 class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : BiddingAdController {
-    override fun loadInterstitialAds() {}
+    override fun loadInterstitialAds(context: Context, callback: InterstitialAdCallback) {}
 
     private val rewardAdsMap: MutableMap<String, RewardVideoAd?> by lazy {
         (adConfiguration.adIdListMap[AdType.REWARD] ?: emptyList())
@@ -85,7 +86,7 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
         }
     }
 
-    override fun displayHighestRevenueInterstitialAd() {
+    override fun displayHighestRevenueInterstitialAd(activity: Activity) {
     }
 
     override fun displayHighestRevenueRewardVideoAd(activity: Activity) {

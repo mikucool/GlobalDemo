@@ -8,7 +8,6 @@ import com.example.globaldemo.GlobalDemoApplication.Companion.container
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.ad.controller.BiddingAdController
-import com.example.globaldemo.ad.factory.AdControllerFactory
 import com.example.globaldemo.data.repository.AppDataSourceUseCase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -42,6 +41,16 @@ class AdUseCase(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                 onTimeout = onTimeout
             )
         }
+    }
+
+    fun preLoadAllInterstitialAds(context: Context) {
+        adControllers.forEach { controller -> controller.loadInterstitialAds(context) }
+    }
+
+    fun displayInterstitialAd(activity: Activity) {
+        // just show Max interstitial ad
+        val maxController = adControllers.find { it.adConfiguration.adPlatform == AdPlatform.MAX }
+        maxController?.displayHighestRevenueInterstitialAd(activity)
     }
 
     private fun loadRewardedAdsWithTimeout(

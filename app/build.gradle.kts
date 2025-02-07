@@ -85,7 +85,7 @@ dependencies {
     // compose view-model
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     // kotlin coroutines
-    implementation("kotlinx.coroutines:kotlinx-coroutines-core:1.6.4")
+    runtimeOnly(libs.kotlinx.coroutines.core)
     // retrofit2
     implementation(libs.retrofit)
     implementation(libs.converter.gson)

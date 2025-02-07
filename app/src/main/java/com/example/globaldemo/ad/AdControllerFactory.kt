@@ -1,4 +1,4 @@
-package com.example.globaldemo.ad.factory
+package com.example.globaldemo.ad
 
 import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.ad.controller.BiddingAdController
