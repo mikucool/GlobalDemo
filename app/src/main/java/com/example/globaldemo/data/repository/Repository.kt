@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.model.AdConfiguration
+import com.example.globaldemo.network.GlobalDemoService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -16,7 +17,10 @@ interface AppRepository {
     suspend fun fetchAdConfigurationByAdPlatform(adPlatform: AdPlatform): AdConfiguration
 }
 
-class RemoteAppRepository : AppRepository {
+class RemoteAppRepository(private val globalDemoService: GlobalDemoService) : AppRepository {
+    suspend fun testGet(): Any = globalDemoService.testGet()
+    suspend fun testPost(body: String): Any = globalDemoService.testPost(body)
+
     override suspend fun fetchAdConfigurationByAdPlatform(adPlatform: AdPlatform): AdConfiguration {
         return AdConfiguration()
     }

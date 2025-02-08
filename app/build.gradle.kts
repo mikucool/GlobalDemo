@@ -44,7 +44,7 @@ android {
 
         debug {
             isMinifyEnabled = false
-            signingConfig = signingConfigs["release"]
+//            signingConfig = signingConfigs["release"]
             isDebuggable = true
         }
     }
@@ -90,6 +90,9 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.gson)
+    implementation(libs.logging.interceptor)
+    // ktx serialization
+    implementation(libs.kotlinx.serialization.json)
     // datastore
     implementation(libs.androidx.datastore.preferences)
     // kwai

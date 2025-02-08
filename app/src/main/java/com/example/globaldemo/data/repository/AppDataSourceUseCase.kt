@@ -2,9 +2,11 @@ package com.example.globaldemo.data.repository
 
 import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.model.AdConfiguration
+import com.example.globaldemo.network.RetrofitClient
 
 class AppDataSourceUseCase {
-    private val remoteRepository: AppRepository = RemoteAppRepository()
+    private val remoteRepository: AppRepository =
+        RemoteAppRepository(RetrofitClient.globalDemoService)
     private val localRepository: AppRepository = LocalAppRepository()
     suspend fun fetchAdConfigurationByAdPlatform(adPlatform: AdPlatform): AdConfiguration {
         val isUseLocalData = true
@@ -14,4 +16,13 @@ class AppDataSourceUseCase {
             remoteRepository.fetchAdConfigurationByAdPlatform(adPlatform)
         }
     }
+
+    suspend fun testGet(): Any {
+        return (remoteRepository as RemoteAppRepository).testGet()
+    }
+
+    suspend fun testPost(body: String): Any {
+        return (remoteRepository as RemoteAppRepository).testPost(body)
+    }
+
 }
