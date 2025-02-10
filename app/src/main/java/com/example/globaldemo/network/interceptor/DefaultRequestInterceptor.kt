@@ -4,11 +4,15 @@ import android.util.Log
 import com.example.globaldemo.model.DefaultHttpHeader
 import com.example.globaldemo.network.RetrofitClient.HTTP_LOG_TAG
 import com.example.globaldemo.network.security.HttpSecurityManager
+import com.example.globaldemo.verification.VerificationHelper
 import okhttp3.Interceptor
 import okhttp3.Response
 import okio.Buffer
 
 class DefaultRequestInterceptor : Interceptor {
+
+    private val defaultHttpHeader: DefaultHttpHeader by lazy { DefaultHttpHeader() }
+
     companion object {
         private const val TAG = "${HTTP_LOG_TAG}_DefaultRequestInterceptor"
     }
@@ -16,7 +20,7 @@ class DefaultRequestInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         if (originalRequest.body == null) return chain.proceed(originalRequest)
-        val defaultHttpHeader = getDefaultHttpHeader()
+        val defaultHttpHeader = getUpdatedDefaultHttpHeader()
         Log.i(TAG, "<-----------------encrypt request start----------------->")
         Log.i(TAG, "default header: $defaultHttpHeader")
         val originalRequestBodyBuffer = Buffer()
@@ -39,31 +43,19 @@ class DefaultRequestInterceptor : Interceptor {
         return chain.proceed(encryptedRequest)
     }
 
-    private fun getDefaultHttpHeader(): DefaultHttpHeader {
-        return DefaultHttpHeader(
-            adid = "",
-            androidId = "",
-            androidVersion = "",
-            appid = "",
-            campaign = "",
-            campaignId = "",
-            channel = "",
-            country = "",
-            currentTime = 0L,
-            gaid = "",
-            language = "",
-            packageName = "",
-            phoneBrand = "",
-            phoneModel = "",
-            shumengPkgName = "",
-            sim = 0,
-            thirdId = "",
-            timeZone = "",
-            token = "",
-            userType = "",
-            uuid = "",
-            vc = "",
-            vn = ""
+    private fun getUpdatedDefaultHttpHeader(): DefaultHttpHeader {
+        return this.defaultHttpHeader.copy(
+            currentTime = System.currentTimeMillis(),
+            uuid = VerificationHelper.getUUID(),
+            androidId = VerificationHelper.getAndroidId(),
+            userType = VerificationHelper.getUerType(),
+            gaid = VerificationHelper.getGoogleAdId(),
+            timeZone = VerificationHelper.getTimeZone(),
+            language = VerificationHelper.getLanguage(),
+            sim = VerificationHelper.getSim(),
+            country = VerificationHelper.getCountry(),
+            token = VerificationHelper.getRandomToken()
         )
     }
+
 }

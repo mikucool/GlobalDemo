@@ -27,4 +27,7 @@ object ApplicationConfiguration {
     const val HTTP_RSA_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjHWWHog4k15o9XGuEyybTB00wu98mk//yc0eEYOAhX6K3dP0H9qRoaRZ/A78yFIZEhxguJ3OHirQzDfP6dinIUI4zgOGAb17aB4Ha0NtBUJ+Ffsij700ukuKF/XsTmsNNfBJrreRDsx+Hf8nikYtSpXBalGWISub61xATScya9at8SDNZ75BWA2U5XKrOTcGetORs+f7KL4Gh3QNdi/zUDALi5tbcM+bAENnYkrjN/k0q/NdWHuqA2nmWNkBX7KeYJO50bxarLdwZ1b48frjb423TyzU2JDwVH0ZiQyzZXG2VO0DQb/2dXfG9XDA94fMNAQ4EJAgNg/3G1uea7MDpwIDAQAB"
     const val HTTP_AES_IV = "nUXHleZzQEukiMSW" // used for decrypting response
     const val HTTP_AES_KEY = "uQacLbddLYUotTJw" // used for decrypting response
+
+    const val APP_VEST_PACKAGE_NAME = "com.wingswealth.osha"
+    const val APP_ID = "1869262619915898882"
 }

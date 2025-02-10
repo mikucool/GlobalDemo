@@ -5,7 +5,7 @@ import com.example.globaldemo.ad.AdSdkInitializer
 import com.example.globaldemo.analysis.ThinkingDataUtil
 import com.example.globaldemo.data.AppContainer
 import com.example.globaldemo.data.DefaultAppContainer
-import com.example.globaldemo.verification.SMUtil
+import com.example.globaldemo.verification.VerificationManager
 
 class GlobalDemoApplication : Application() {
     companion object {
@@ -27,6 +27,6 @@ class GlobalDemoApplication : Application() {
         AdSdkInitializer.initBigoAd(this)
         AdSdkInitializer.initMaxAd(this)
         ThinkingDataUtil.initThinkingDataAnalytics(this)
-        SMUtil.initSM(this)
+        VerificationManager.initSMAndQueryID(this)
     }
 }
