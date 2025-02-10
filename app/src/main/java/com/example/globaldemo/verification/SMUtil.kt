@@ -1,4 +1,4 @@
-package com.example.globaldemo.identifier
+package com.example.globaldemo.verification
 
 import android.content.Context
 import android.util.Log
