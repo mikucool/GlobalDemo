@@ -107,7 +107,6 @@ object HttpSecurityManager {
         content: String,
         publicKey: String = ApplicationConfiguration.HTTP_RSA_PUBLIC_KEY
     ): String {
-        // TODO: specific base64 decoder
         val publicKeyBytes = Base64.getDecoder().decode(publicKey)
         val rsaPublicKey = KeyFactory.getInstance("RSA")
             .generatePublic(X509EncodedKeySpec(publicKeyBytes)) as RSAPublicKey

@@ -1,6 +1,7 @@
 package com.example.globaldemo.network
 
 import com.example.globaldemo.network.interceptor.DefaultRequestInterceptor
+import com.example.globaldemo.network.interceptor.DefaultResponseInterceptor
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -10,7 +11,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
     private const val BASE_URL = "http://192.168.50.32:8080" // Replace with your API base URL
-
+    const val HTTP_LOG_TAG = "HttpLog"
     val globalDemoService: GlobalDemoService by lazy {
 
         val okHttpClient = OkHttpClient.Builder()
@@ -20,6 +21,7 @@ object RetrofitClient {
             .writeTimeout(60, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
             .addInterceptor(DefaultRequestInterceptor())
+            .addInterceptor(DefaultResponseInterceptor())
             .build()
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
