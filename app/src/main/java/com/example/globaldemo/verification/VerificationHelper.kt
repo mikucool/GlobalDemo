@@ -1,11 +1,9 @@
 package com.example.globaldemo.verification
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.provider.Settings
 import com.example.globaldemo.GlobalDemoApplication
 import com.google.android.gms.ads.identifier.AdvertisingIdClient
-import com.kwai.network.a.va
 import java.util.Locale
 import java.util.UUID
 
@@ -69,5 +67,25 @@ object VerificationHelper {
     fun getUerType(): Int = 0
 
     fun getRandomToken(): String = UUID.randomUUID().toString()
+
+    fun getAdId(): String {
+        return "AD_ID"
+    }
+
+    fun getChannel(): String {
+        return "CHANNEL"
+    }
+
+    fun getCampaign(): String {
+        return "CAMPAIGN"
+    }
+
+    fun getCampaignId(): String {
+        return "CAMPAIGN_ID"
+    }
+
+    fun getThirdId(): String {
+        return "THIRD_ID"
+    }
 
 }

@@ -54,7 +54,12 @@ class DefaultRequestInterceptor : Interceptor {
             language = VerificationHelper.getLanguage(),
             sim = VerificationHelper.getSim(),
             country = VerificationHelper.getCountry(),
-            token = VerificationHelper.getRandomToken()
+            token = VerificationHelper.getRandomToken(),
+            adid = VerificationHelper.getAdId(),
+            channel = VerificationHelper.getChannel(),
+            campaign = VerificationHelper.getCampaign(),
+            campaignId = VerificationHelper.getCampaignId(),
+            thirdId = VerificationHelper.getThirdId()
         )
     }
 
