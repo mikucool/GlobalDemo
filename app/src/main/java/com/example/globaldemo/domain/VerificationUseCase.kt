@@ -24,7 +24,7 @@ class VerificationUseCase(val context: Context) {
     private val channel: Flow<String> = verificationRepository.channel
     val smId: Flow<String> = verificationRepository.smId
 
-    private val uuid: String by lazy {
+    val uuid: String by lazy {
         val localUuid = runBlocking { verificationRepository.uuid.first() }
         localUuid.ifEmpty {
             val newUuid = java.util.UUID.randomUUID().toString()
@@ -33,14 +33,14 @@ class VerificationUseCase(val context: Context) {
         }
     }
 
-    private val androidId: String? by lazy {
+    val androidId: String? by lazy {
         Settings.Secure.getString(
             context.contentResolver,
             Settings.Secure.ANDROID_ID
         )
     }
 
-    private val googleAdId: String? by lazy {
+    val googleAdId: String? by lazy {
         try {
             val info = AdvertisingIdClient.getAdvertisingIdInfo(context)
             info.id

@@ -2,7 +2,7 @@ package com.example.globaldemo
 
 import android.app.Application
 import com.example.globaldemo.ad.AdSdkInitializer
-import com.example.globaldemo.analysis.ThinkingDataUtil
+import com.example.globaldemo.analytic.DataAnalyticManager
 import com.example.globaldemo.verification.VerificationManager
 
 class GlobalDemoApplication : Application() {
@@ -24,7 +24,7 @@ class GlobalDemoApplication : Application() {
         AdSdkInitializer.initKwaiAd(this)
         AdSdkInitializer.initBigoAd(this)
         AdSdkInitializer.initMaxAd(this)
-        ThinkingDataUtil.initThinkingDataAnalytics(this)
+        DataAnalyticManager.init(this,container.verificationUseCase)
         VerificationManager.init(this, container.verificationUseCase)
     }
 }
