@@ -3,7 +3,7 @@ package com.example.globaldemo.ui.screen.test
 import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.example.globaldemo.ad.AdUseCase
+import com.example.globaldemo.domain.AdUseCase
 import com.example.globaldemo.ad.constant.RewardAdState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

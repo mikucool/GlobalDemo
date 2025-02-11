@@ -1,14 +1,14 @@
-package com.example.globaldemo.ad
+package com.example.globaldemo.domain
 
 import android.app.Activity
 import android.content.Context
 import android.os.CountDownTimer
 import android.util.Log
 import com.example.globaldemo.GlobalDemoApplication.Companion.container
+import com.example.globaldemo.ad.AdControllerFactory
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.ad.controller.BiddingAdController
-import com.example.globaldemo.data.repository.AppDataSourceUseCase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope

@@ -1,6 +1,9 @@
-package com.example.globaldemo.data.repository
+package com.example.globaldemo.domain
 
 import com.example.globaldemo.ad.constant.AdPlatform
+import com.example.globaldemo.data.AppRepository
+import com.example.globaldemo.data.LocalAppRepository
+import com.example.globaldemo.data.RemoteAppRepository
 import com.example.globaldemo.model.AdConfiguration
 import com.example.globaldemo.network.RetrofitClient
 

@@ -1,7 +1,7 @@
 package com.example.globaldemo.network.security
 
 import com.example.globaldemo.configuration.ApplicationConfiguration
-import com.example.globaldemo.model.DefaultHttpHeader
+import com.example.globaldemo.network.interceptor.DefaultRequestInterceptor
 import com.google.gson.Gson
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Request
@@ -27,7 +27,7 @@ object HttpSecurityManager {
      * @param defaultHttpHeader 默认请求头
      * @return 加密后的请求
      */
-    fun encryptRequest(originalRequest: Request, defaultHttpHeader: DefaultHttpHeader): Request {
+    fun encryptRequest(originalRequest: Request, defaultHttpHeader: DefaultRequestInterceptor.DefaultHttpHeader): Request {
         val originalBody = originalRequest.body
         val bodyBuffer = Buffer()
         originalBody?.writeTo(bodyBuffer)

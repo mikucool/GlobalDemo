@@ -1,17 +1,19 @@
 package com.example.globaldemo.network.interceptor
 
+import android.os.Build
 import android.util.Log
-import com.example.globaldemo.model.DefaultHttpHeader
+import com.example.globaldemo.BuildConfig
+import com.example.globaldemo.GlobalDemoApplication.Companion.container
+import com.example.globaldemo.configuration.ApplicationConfiguration
 import com.example.globaldemo.network.RetrofitClient.HTTP_LOG_TAG
 import com.example.globaldemo.network.security.HttpSecurityManager
-import com.example.globaldemo.verification.VerificationHelper
+import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 import okio.Buffer
+import java.util.UUID
 
 class DefaultRequestInterceptor : Interceptor {
-
-    private val defaultHttpHeader: DefaultHttpHeader by lazy { DefaultHttpHeader() }
 
     companion object {
         private const val TAG = "${HTTP_LOG_TAG}_DefaultRequestInterceptor"
@@ -20,7 +22,7 @@ class DefaultRequestInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         if (originalRequest.body == null) return chain.proceed(originalRequest)
-        val defaultHttpHeader = getUpdatedDefaultHttpHeader()
+        val defaultHttpHeader = runBlocking { getUpdatedDefaultHttpHeader() }
         Log.i(TAG, "<-----------------encrypt request start----------------->")
         Log.i(TAG, "default header: $defaultHttpHeader")
         val originalRequestBodyBuffer = Buffer()
@@ -43,24 +45,52 @@ class DefaultRequestInterceptor : Interceptor {
         return chain.proceed(encryptedRequest)
     }
 
-    private fun getUpdatedDefaultHttpHeader(): DefaultHttpHeader {
-        return this.defaultHttpHeader.copy(
+    private suspend fun getUpdatedDefaultHttpHeader(): DefaultHttpHeader {
+        val verificationInfo = container.verificationUseCase.getVerificationInfo()
+        val randomToken = UUID.randomUUID().toString()
+        return DefaultHttpHeader(
             currentTime = System.currentTimeMillis(),
-            uuid = VerificationHelper.getUUID(),
-            androidId = VerificationHelper.getAndroidId(),
-            userType = VerificationHelper.getUerType(),
-            gaid = VerificationHelper.getGoogleAdId(),
-            timeZone = VerificationHelper.getTimeZone(),
-            language = VerificationHelper.getLanguage(),
-            sim = VerificationHelper.getSim(),
-            country = VerificationHelper.getCountry(),
-            token = VerificationHelper.getRandomToken(),
-            adid = VerificationHelper.getAdId(),
-            channel = VerificationHelper.getChannel(),
-            campaign = VerificationHelper.getCampaign(),
-            campaignId = VerificationHelper.getCampaignId(),
-            thirdId = VerificationHelper.getThirdId()
+            uuid = verificationInfo.uuid,
+            androidId = verificationInfo.androidId,
+            userType = verificationInfo.userType,
+            gaid = verificationInfo.googleAdId,
+            timeZone = verificationInfo.timeZone,
+            language = verificationInfo.language,
+            sim = verificationInfo.sim,
+            country = verificationInfo.country,
+            token = randomToken,
+            adid = verificationInfo.adId,
+            channel = verificationInfo.channel,
+            campaign = verificationInfo.campaign,
+            campaignId = verificationInfo.campaignId,
+            thirdId = verificationInfo.thirdId
         )
     }
+
+    data class DefaultHttpHeader(
+        val adid: String? = null,
+        val androidId: String? = null,
+        val androidVersion: Int = Build.VERSION.SDK_INT,
+        val appid: String = ApplicationConfiguration.APP_ID,
+        val campaign: String? = null,
+        val campaignId: String? = null,
+        val channel: String? = null,
+        val country: String? = null,
+        val currentTime: Long = 0,
+        val gaid: String? = null,
+        val language: String? = "",
+        val packageName: String = ApplicationConfiguration.APP_VEST_PACKAGE_NAME,
+        val phoneBrand: String = Build.BRAND,
+        val phoneModel: String = Build.MODEL,
+        val shumengPkgName: String = BuildConfig.APPLICATION_ID,
+        val sim: Int = -1,
+        val thirdId: String? = null,
+        val timeZone: String? = "",
+        val token: String? = null,
+        val userType: Int = 0,
+        val uuid: String? = null,
+        val vc: Int = BuildConfig.VERSION_CODE,
+        val vn: String = BuildConfig.VERSION_NAME
+    )
 
 }

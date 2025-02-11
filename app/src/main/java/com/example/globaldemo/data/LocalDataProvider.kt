@@ -1,4 +1,4 @@
-package com.example.globaldemo.data.repository
+package com.example.globaldemo.data
 
 import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.ad.constant.AdType
