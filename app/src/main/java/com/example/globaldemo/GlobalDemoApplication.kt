@@ -2,8 +2,10 @@ package com.example.globaldemo
 
 import android.app.Application
 import com.example.globaldemo.ad.AdSdkInitializer
+import com.example.globaldemo.analytic.AdjustInitializer
 import com.example.globaldemo.analytic.SMInitializer
 import com.example.globaldemo.analytic.ThinkingDataInitializer
+import com.example.globaldemo.model.AdjustInitConfiguration
 
 class GlobalDemoApplication : Application() {
     companion object {
@@ -26,5 +28,6 @@ class GlobalDemoApplication : Application() {
         AdSdkInitializer.initMaxAd(this)
         ThinkingDataInitializer.initialize(this)
         SMInitializer.initialize(this)
+        AdjustInitializer.startAttribute(context = this, AdjustInitConfiguration.OnAppStart::class)
     }
 }

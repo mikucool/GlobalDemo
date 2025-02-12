@@ -1,8 +1,6 @@
 package com.example.globaldemo.analytic
 
 import android.content.Context
-import android.os.Handler
-import android.os.HandlerThread
 import android.text.TextUtils
 import android.util.Log
 import com.adjust.sdk.Adjust
@@ -24,36 +22,32 @@ import kotlin.reflect.KClass
 
 object AdjustInitializer {
     private const val TAG = "AdjustInitializer"
-    var isAdjustInitialized = false
-        private set
 
     fun startAttribute(context: Context, triggerType: KClass<out AdjustInitConfiguration>) {
         CoroutineScope(Dispatchers.IO).launch {
             Log.d(TAG, "startAttribute() called with: context = $context")
-            if (!isNeedToAttribute() && checkAdjustInitConfig(triggerType)) return@launch
-            Log.d(TAG, "startAttribute()...")
-            val adjustEnvironment =
-                if (BuildConfig.DEBUG) AdjustConfig.ENVIRONMENT_SANDBOX else AdjustConfig.ENVIRONMENT_PRODUCTION
-            val adjustLogLevel = if (BuildConfig.DEBUG) LogLevel.VERBOSE else LogLevel.WARN
-            val adjustConfig = AdjustConfig(
-                context,
-                ApplicationConfiguration.ADJUST_APP_TOKEN,
-                adjustEnvironment
-            ).apply {
-                setLogLevel(adjustLogLevel)
-                enableSendingInBackground()
-                onAttributionChangedListener = OnAttributionChangedListener {
-                    Log.d(TAG, "onAttributionChanged() called with: it = $it")
-                    CoroutineScope(Dispatchers.IO).launch {
-                        onAttributeChanged(it)
+            if (isNeedToAttribute() && checkAdjustInitConfig(triggerType)) {
+                Log.d(TAG, "startAttribute()...")
+                val adjustEnvironment =
+                    if (BuildConfig.DEBUG) AdjustConfig.ENVIRONMENT_SANDBOX else AdjustConfig.ENVIRONMENT_PRODUCTION
+                val adjustLogLevel = if (BuildConfig.DEBUG) LogLevel.VERBOSE else LogLevel.WARN
+                val adjustConfig = AdjustConfig(
+                    context,
+                    ApplicationConfiguration.ADJUST_APP_TOKEN,
+                    adjustEnvironment
+                ).apply {
+                    setLogLevel(adjustLogLevel)
+                    enableSendingInBackground()
+                    onAttributionChangedListener = OnAttributionChangedListener {
+                        Log.d(TAG, "onAttributionChanged() called with: it = $it")
+                        CoroutineScope(Dispatchers.IO).launch {
+                            onAttributeChanged(it)
+                        }
                     }
                 }
+                Adjust.initSdk(adjustConfig)
+                updateAdIdIfNeeded()
             }
-            Adjust.initSdk(adjustConfig)
-            updateAdIdIfNeeded()
-            Handler(HandlerThread("background_thread").looper).postDelayed({
-                Adjust.onResume()
-            }, 200)
         }
     }
 
@@ -115,7 +109,6 @@ object AdjustInitializer {
         val channel = adjustAttribution.network?.trim() ?: ""
         val adjustAttributionMap = mutableMapOf<String, String>()
         if (channel.isNotEmpty()) {
-            isAdjustInitialized = true
             adjustAttributionMap["channel"] = channel
             verificationUseCase.setChannel(channel)
         }
