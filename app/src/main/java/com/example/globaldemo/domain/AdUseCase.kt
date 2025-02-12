@@ -21,6 +21,8 @@ class AdUseCase(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     private val adControllers: List<BiddingAdController> by lazy {
         runBlocking { getAdControllers() }
     }
+    var videoAdShowTimes = 4
+        private set
 
     private var adLoadingCountDownTimer: CountDownTimer? = null
     private var isLoadingTimeout = false

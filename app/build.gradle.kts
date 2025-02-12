@@ -108,6 +108,11 @@ dependencies {
     implementation(libs.thinkinganalyticssdk)
     // 数盟
     implementation(libs.dusdk)
+    // adjust
+    implementation(libs.adjust.android)
+    implementation(libs.installreferrer)
+    implementation(libs.play.services.ads.identifier)
+    implementation(libs.play.services.appset)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

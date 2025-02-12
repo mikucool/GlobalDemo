@@ -18,10 +18,10 @@ class VerificationUseCase(val context: Context) {
     private val verificationRepository: VerificationRepository =
         VerificationRepository(context.dataStore)
     val hasSetDistinctId: Flow<Boolean> = verificationRepository.hasSetDistinctId
-    private val adId: Flow<String> = verificationRepository.adId
+    val adId: Flow<String> = verificationRepository.adId
     private val campaign: Flow<String> = verificationRepository.campaign
     private val campaignId: Flow<String> = verificationRepository.campaignId
-    private val channel: Flow<String> = verificationRepository.channel
+    val channel: Flow<String> = verificationRepository.channel
     val smId: Flow<String> = verificationRepository.smId
 
     val uuid: String by lazy {
@@ -63,7 +63,7 @@ class VerificationUseCase(val context: Context) {
         context.resources.configuration.locales.get(0)?.language
     }
 
-    private val country: String by lazy {
+    val country: String by lazy {
         try {
             var countryCode = context.resources.configuration.locales[0].country
             if (countryCode.isEmpty()) {
@@ -76,7 +76,7 @@ class VerificationUseCase(val context: Context) {
         }
     }
 
-    private val sim: Int by lazy {
+    val sim: Int by lazy {
         try {
             val tm = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
             val simOperatorName = tm.simOperatorName
@@ -111,10 +111,6 @@ class VerificationUseCase(val context: Context) {
 
     suspend fun setChannel(channel: String) {
         verificationRepository.setChannel(channel)
-    }
-
-    suspend fun setUuid(uuid: String) {
-        verificationRepository.setUuid(uuid)
     }
 
     suspend fun setSmId(smId: String) {
