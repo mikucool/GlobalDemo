@@ -5,6 +5,7 @@ import com.example.globaldemo.data.AppRepository
 import com.example.globaldemo.data.LocalAppRepository
 import com.example.globaldemo.data.RemoteAppRepository
 import com.example.globaldemo.model.AdConfiguration
+import com.example.globaldemo.model.AdjustInitConfiguration
 import com.example.globaldemo.network.RetrofitClient
 
 class AppDataSourceUseCase {
@@ -17,6 +18,15 @@ class AppDataSourceUseCase {
             localRepository.fetchAdConfigurationByAdPlatform(adPlatform)
         } else {
             remoteRepository.fetchAdConfigurationByAdPlatform(adPlatform)
+        }
+    }
+
+    suspend fun fetchAdjustInitConfig(): AdjustInitConfiguration {
+        return try {
+            remoteRepository.fetchAdjustInitConfig()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            localRepository.fetchAdjustInitConfig()
         }
     }
 

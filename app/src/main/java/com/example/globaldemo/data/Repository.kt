@@ -8,13 +8,21 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.globaldemo.ad.constant.AdPlatform
+import com.example.globaldemo.configuration.FpConfigurationField
+import com.example.globaldemo.configuration.FpConfigurationId
 import com.example.globaldemo.model.AdConfiguration
+import com.example.globaldemo.model.AdjustInitConfiguration
+import com.example.globaldemo.model.BaseFpResult
+import com.example.globaldemo.model.FpConfiguration
+import com.example.globaldemo.model.FpParameters
 import com.example.globaldemo.network.GlobalDemoService
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 interface AppRepository {
     suspend fun fetchAdConfigurationByAdPlatform(adPlatform: AdPlatform): AdConfiguration
+    suspend fun fetchAdjustInitConfig(): AdjustInitConfiguration
 }
 
 class RemoteAppRepository(private val globalDemoService: GlobalDemoService) : AppRepository {
@@ -25,11 +33,56 @@ class RemoteAppRepository(private val globalDemoService: GlobalDemoService) : Ap
         return AdConfiguration()
     }
 
+    override suspend fun fetchAdjustInitConfig(): AdjustInitConfiguration {
+        val adjustFp = globalDemoService.fetchAppFp(getAppFpParameters()).data
+        val adjustConfiguration =
+            adjustFp?.findFpConfigurationByField(FpConfigurationField.FLYING_CHESS_ADJUST_INIT_CONFIGURATION)
+        return if (adjustConfiguration != null) {
+            val configJson = adjustConfiguration.jsonContent
+            val stringArray = Gson().fromJson(configJson, Array<String>::class.java)
+            val first = stringArray[0].toInt()
+            val second = stringArray[1].toFloat()
+            when (first) {
+                0 -> AdjustInitConfiguration.None()
+                1 -> AdjustInitConfiguration.OnAppStart(second)
+                2 -> AdjustInitConfiguration.OnSmallWithdrawalTaskCompletion(second)
+                3 -> AdjustInitConfiguration.OnWithdrawalScreenAfterTask(second)
+                4 -> AdjustInitConfiguration.OnWithdrawalButtonClickAfterTask(second)
+                5 -> AdjustInitConfiguration.OnWithdrawalInitiated(second)
+                else -> {
+                    if (first > 10)
+                        AdjustInitConfiguration.AfterSpecificAdViews(first - 10, second)
+                    else AdjustInitConfiguration.None()
+                }
+            }
+        } else {
+            AdjustInitConfiguration.None()
+        }
+    }
+
+    private fun getAppFpParameters(): FpParameters {
+        return FpParameters(
+            fpConfigId = FpConfigurationId.FLYING_CHESS_APP_CONFIGURATION,
+            configField = "${FpConfigurationField.FLYING_CHESS_ADJUST_INIT_CONFIGURATION}," +
+                    "${FpConfigurationField.FLYING_CHESS_AD_MAX_INTERSTITIAL_IDS}," +
+                    "${FpConfigurationField.FLYING_CHESS_AD_MAX_REWARD_IDS}," +
+                    "${FpConfigurationField.FLYING_CHESS_AD_KWAI_REWARD_IDS}," +
+                    "${FpConfigurationField.FLYING_CHESS_AD_BIGO_REWARD_IDS},"
+        )
+    }
+
+    private fun BaseFpResult.findFpConfigurationByField(field: String): FpConfiguration? {
+        return this.fpConfigurations.find { it.id == field }
+    }
+
 }
 
 class LocalAppRepository : AppRepository {
     override suspend fun fetchAdConfigurationByAdPlatform(adPlatform: AdPlatform): AdConfiguration =
         LocalDataProvider.fetchAdConfigurationByAdPlatform(adPlatform)
+
+    override suspend fun fetchAdjustInitConfig(): AdjustInitConfiguration =
+        LocalDataProvider.fetchAdjustInitConfig()
 
 }
 

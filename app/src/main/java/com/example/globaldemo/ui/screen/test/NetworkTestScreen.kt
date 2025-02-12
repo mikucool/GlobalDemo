@@ -50,6 +50,9 @@ fun NetworkTestScreen(
             Button(onClick = { viewModel.testGet() }) {
                 Text(text = "Test Get")
             }
+            Button(onClick = { viewModel.testAdjustFp() }) {
+                Text(text = "Test AdjustFp")
+            }
         }
 
     }

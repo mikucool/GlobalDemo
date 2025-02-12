@@ -21,4 +21,9 @@ class NetworkTestViewModel : ViewModel() {
         viewModelScope.launch { _response.value = appDataSourceUseCase.testPost("this is a test post request body").toString() }
 
     }
+
+    fun testAdjustFp() {
+        val appDataSourceUseCase = GlobalDemoApplication.container.appDataSourceUseCase
+        viewModelScope.launch { _response.value = appDataSourceUseCase.fetchAdjustInitConfig().toString() }
+    }
 }

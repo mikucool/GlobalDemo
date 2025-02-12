@@ -4,10 +4,15 @@ import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.configuration.ApplicationConfiguration
 import com.example.globaldemo.model.AdConfiguration
+import com.example.globaldemo.model.AdjustInitConfiguration
 
 object LocalDataProvider {
     fun fetchAdConfigurationByAdPlatform(adPlatform: AdPlatform): AdConfiguration {
         return AD_CONFIGURATIONS.find { it.adPlatform == adPlatform } ?: AdConfiguration()
+    }
+
+    fun fetchAdjustInitConfig(): AdjustInitConfiguration {
+        return AdjustInitConfiguration.None()
     }
 
     private val AD_CONFIGURATIONS = listOf(

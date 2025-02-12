@@ -15,13 +15,13 @@ object RetrofitClient {
     val globalDemoService: GlobalDemoService by lazy {
 
         val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
             .addInterceptor(DefaultRequestInterceptor())
             .addInterceptor(DefaultResponseInterceptor())
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .build()
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
