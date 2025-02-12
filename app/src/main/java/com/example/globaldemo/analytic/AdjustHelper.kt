@@ -20,7 +20,7 @@ import java.util.regex.Pattern
 import kotlin.random.Random
 import kotlin.reflect.KClass
 
-object AdjustInitializer {
+object AdjustHelper {
     private const val TAG = "AdjustInitializer"
 
     fun startAttribute(context: Context, triggerType: KClass<out AdjustInitConfiguration>) {

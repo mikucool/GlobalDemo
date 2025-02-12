@@ -2,9 +2,9 @@ package com.example.globaldemo
 
 import android.app.Application
 import com.example.globaldemo.ad.AdSdkInitializer
-import com.example.globaldemo.analytic.AdjustInitializer
-import com.example.globaldemo.analytic.SMInitializer
-import com.example.globaldemo.analytic.ThinkingDataInitializer
+import com.example.globaldemo.analytic.AdjustHelper
+import com.example.globaldemo.analytic.SMHelper
+import com.example.globaldemo.analytic.ThinkingDataHelper
 import com.example.globaldemo.model.AdjustInitConfiguration
 
 class GlobalDemoApplication : Application() {
@@ -26,8 +26,8 @@ class GlobalDemoApplication : Application() {
         AdSdkInitializer.initKwaiAd(this)
         AdSdkInitializer.initBigoAd(this)
         AdSdkInitializer.initMaxAd(this)
-        ThinkingDataInitializer.initialize(this)
-        SMInitializer.initialize(this)
-        AdjustInitializer.startAttribute(context = this, AdjustInitConfiguration.OnAppStart::class)
+        ThinkingDataHelper.initialize(this)
+        SMHelper.initialize(this)
+        AdjustHelper.startAttribute(context = this, AdjustInitConfiguration.OnAppStart::class)
     }
 }

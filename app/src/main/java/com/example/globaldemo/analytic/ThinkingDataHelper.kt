@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-object ThinkingDataInitializer {
+object ThinkingDataHelper {
 
     private const val TAG = "ThinkingDataAnalyticsManager"
 

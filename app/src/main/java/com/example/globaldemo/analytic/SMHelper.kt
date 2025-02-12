@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-object SMInitializer {
+object SMHelper {
 
     private const val TAG = "SMInitializer"
 
