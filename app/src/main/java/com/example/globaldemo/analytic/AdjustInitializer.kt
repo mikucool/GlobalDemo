@@ -1,4 +1,4 @@
-package com.example.globaldemo.verification
+package com.example.globaldemo.analytic
 
 import android.content.Context
 import android.os.Handler

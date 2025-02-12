@@ -1,26 +1,24 @@
-package com.example.globaldemo.verification
+package com.example.globaldemo.analytic
 
 import android.content.Context
 import android.util.Log
 import cn.shuzilm.core.Main
+import com.example.globaldemo.GlobalDemoApplication
 import com.example.globaldemo.configuration.ApplicationConfiguration
-import com.example.globaldemo.domain.VerificationUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SMInitializer(private val verificationUseCase: VerificationUseCase) {
+object SMInitializer {
 
-    companion object {
-        private const val TAG = "SMInitializer"
-    }
+    private const val TAG = "SMInitializer"
 
     fun initialize(context: Context) {
         Log.d(TAG, "initialize() called")
-        initializeSM(context)
         CoroutineScope(Dispatchers.IO).launch {
+            initializeSM(context)
             queryAndSetId(context)
         }
     }
@@ -31,6 +29,7 @@ class SMInitializer(private val verificationUseCase: VerificationUseCase) {
     }
 
     private suspend fun queryAndSetId(context: Context) {
+        val verificationUseCase = GlobalDemoApplication.container.verificationUseCase
         Log.d(TAG, "queryAndSetId() called")
         // Check if smId is already set
         if (verificationUseCase.smId.first().isNotEmpty()) {
