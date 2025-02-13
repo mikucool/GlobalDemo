@@ -70,6 +70,7 @@ object ThinkingDataHelper {
     }
 
     private fun reportCacheEvents() {
+        Log.d(TAG, "reportCacheEvents() called")
         while (true) {
             val event = eventQueue.poll() ?: break // Exit loop when queue is empty
             event.run()
@@ -93,14 +94,19 @@ object ThinkingDataHelper {
     }
 
     fun updateSuperProperties(jsonObject: JSONObject) {
-        Log.d(TAG, "setSuperProperties() called with: jsonObject = $jsonObject")
-        TDAnalytics.setSuperProperties(jsonObject)
+        enqueueOrRun {
+            Log.d(TAG, "setSuperProperties() called with: jsonObject = $jsonObject")
+            TDAnalytics.setSuperProperties(jsonObject)
+        }
     }
 
     fun log(eventKey: String, jsonObject: JSONObject, isForce: Boolean = false) {
-        Log.d(TAG, "log() called with: eventKey = $eventKey, jsonObject = $jsonObject, isForce = $isForce")
         enqueueOrRun {
             try {
+                Log.d(
+                    TAG,
+                    "log() called with: eventKey = $eventKey, jsonObject = $jsonObject, isForce = $isForce"
+                )
                 TDAnalytics.track(eventKey, jsonObject)
                 if (isForce) TDAnalytics.flush()
             } catch (e: Exception) {
@@ -110,13 +116,17 @@ object ThinkingDataHelper {
     }
 
     fun userSet(jsonObject: JSONObject) {
-        Log.d(TAG, "userSet() called with: jsonObject = $jsonObject")
-        enqueueOrRun { TDAnalytics.userSet(jsonObject) }
+        enqueueOrRun {
+            Log.d(TAG, "userSet() called with: jsonObject = $jsonObject")
+            TDAnalytics.userSet(jsonObject)
+        }
     }
 
     fun userSetOnce(jsonObject: JSONObject) {
-        Log.d(TAG, "userSetOnce() called with: jsonObject = $jsonObject")
-        enqueueOrRun { TDAnalytics.userSetOnce(jsonObject) }
+        enqueueOrRun {
+            Log.d(TAG, "userSetOnce() called with: jsonObject = $jsonObject")
+            TDAnalytics.userSetOnce(jsonObject)
+        }
     }
 
 }
