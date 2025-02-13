@@ -12,11 +12,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.util.concurrent.ConcurrentLinkedQueue
 
+/**
+ * 在设置setDistinctId之前，所有的打点，和用户属性上报事件都要添加到自定义队列中，等设置完setDistinctId之后再统一上报
+ */
 object ThinkingDataHelper {
 
     private const val TAG = "dot_info"
     private var hasInitialized = false
+    private val eventQueue = ConcurrentLinkedQueue<Runnable>() // Use a thread-safe queue
 
     fun initialize(context: Context) {
         Log.d(TAG, "initialize() called with: context = $context")
@@ -32,13 +37,14 @@ object ThinkingDataHelper {
         TDAnalytics.init(config)
         // Launch initialization tasks in a background coroutine
         CoroutineScope(Dispatchers.IO).launch {
-            initializeDistinctId()  // Initialize distinct ID
+            initializeDistinctId()  // Initialize distinct ID,
             hasInitialized = true
             setUserId() // Set user ID
             TDAnalytics.enableAutoTrack(
                 TDAnalytics.TDAutoTrackEventType.APP_END or TDAnalytics.TDAutoTrackEventType.APP_INSTALL
             )   // Enable auto-tracking for app end and install events
             Log.d(TAG, "initialize() called with: initialization completed")
+            reportCacheEvents()
         }
     }
 
@@ -63,6 +69,22 @@ object ThinkingDataHelper {
         }
     }
 
+    private fun reportCacheEvents() {
+        while (true) {
+            val event = eventQueue.poll() ?: break // Exit loop when queue is empty
+            event.run()
+        }
+    }
+
+    private fun enqueueOrRun(block: () -> Unit) {
+        if (hasInitialized) {
+            block()
+        } else {
+            eventQueue.offer(Runnable { block() })
+            Log.w(TAG, "Event enqueued because SDK is not initialized yet.")
+        }
+    }
+
 
     private suspend fun setUserId() {
         val verificationUseCase = GlobalDemoApplication.container.verificationUseCase
@@ -75,45 +97,26 @@ object ThinkingDataHelper {
         TDAnalytics.setSuperProperties(jsonObject)
     }
 
-    // call on SMId was fetched by SMHelper
-    fun updateSMId(smId: String) {
-        Log.d(TAG, "updateSMId() called with: smId = $smId")
-        if (!hasInitialized) {
-            Log.w(TAG, "updateSMId() has not been initialized")
-            return
-        }
-        val jsonObject = JSONObject().apply {
-            put("sm_id", smId)
-            put("install_vc", BuildConfig.VERSION_CODE)
-        }
-        userSet(jsonObject)
-    }
-
     fun log(eventKey: String, jsonObject: JSONObject, isForce: Boolean = false) {
         Log.d(TAG, "log() called with: eventKey = $eventKey, jsonObject = $jsonObject, isForce = $isForce")
-        if (!hasInitialized) {
-            Log.w(TAG, "log() has not been initialized")
-            return
-        }
-        try {
-            TDAnalytics.track(eventKey, jsonObject)
-            if (isForce) TDAnalytics.flush()
-        } catch (e: Exception) {
-            e.printStackTrace()
+        enqueueOrRun {
+            try {
+                TDAnalytics.track(eventKey, jsonObject)
+                if (isForce) TDAnalytics.flush()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error logging event", e)
+            }
         }
     }
 
     fun userSet(jsonObject: JSONObject) {
         Log.d(TAG, "userSet() called with: jsonObject = $jsonObject")
+        enqueueOrRun { TDAnalytics.userSet(jsonObject) }
     }
 
     fun userSetOnce(jsonObject: JSONObject) {
         Log.d(TAG, "userSetOnce() called with: jsonObject = $jsonObject")
-        if (!hasInitialized) {
-            Log.w(TAG, "userSetOnce() has not been initialized")
-            return
-        }
-        TDAnalytics.userSetOnce(jsonObject)
+        enqueueOrRun { TDAnalytics.userSetOnce(jsonObject) }
     }
 
 }

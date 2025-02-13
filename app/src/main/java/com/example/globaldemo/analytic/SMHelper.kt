@@ -3,12 +3,14 @@ package com.example.globaldemo.analytic
 import android.content.Context
 import android.util.Log
 import cn.shuzilm.core.Main
+import com.example.globaldemo.BuildConfig
 import com.example.globaldemo.GlobalDemoApplication
 import com.example.globaldemo.configuration.ApplicationConfiguration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 object SMHelper {
 
@@ -34,7 +36,7 @@ object SMHelper {
         val smId = verificationUseCase.smId.first()
         if (smId.isNotEmpty()) {
             Log.d(TAG, "queryAndSetId() smId already set")
-            ThinkingDataHelper.updateSMId(smId)
+            reportToThinkingData(smId)
             return
         }
 
@@ -43,7 +45,7 @@ object SMHelper {
             if (id.isNotEmpty()) {
                 CoroutineScope(Dispatchers.IO).launch {
                     verificationUseCase.setSmId(id)
-                    ThinkingDataHelper.updateSMId(id)
+                    reportToThinkingData(smId)
                     Log.d(TAG, "queryAndSetId() smId set successfully")
                 }
             } else {
@@ -54,5 +56,13 @@ object SMHelper {
                 }
             }
         }
+    }
+
+    private fun reportToThinkingData(smId: String) {
+        val jsonObject = JSONObject().apply {
+            put("sm_id", smId)
+            put("install_vc", BuildConfig.VERSION_CODE)
+        }
+        ThinkingDataHelper.userSet(jsonObject)
     }
 }
