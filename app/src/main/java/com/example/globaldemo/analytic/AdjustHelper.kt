@@ -177,7 +177,7 @@ object AdjustHelper {
             put("banknotes", LocalUserDataHelper.getUserMoney())
         })
         ThinkingDataHelper.log("tenji_time", JSONObject().apply {
-            put("time", System.currentTimeMillis()-startTime)
+            put("time", System.currentTimeMillis() - startTime)
         })
     }
 }
