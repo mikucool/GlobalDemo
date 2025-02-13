@@ -30,10 +30,10 @@ object ThinkingDataHelper {
             if (BuildConfig.DEBUG) mode = TDConfig.ModeEnum.DEBUG
         }
         TDAnalytics.init(config)
-        hasInitialized = true
         // Launch initialization tasks in a background coroutine
         CoroutineScope(Dispatchers.IO).launch {
             initializeDistinctId()  // Initialize distinct ID
+            hasInitialized = true
             setUserId() // Set user ID
             TDAnalytics.enableAutoTrack(
                 TDAnalytics.TDAutoTrackEventType.APP_END or TDAnalytics.TDAutoTrackEventType.APP_INSTALL
