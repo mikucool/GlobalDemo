@@ -1,7 +1,6 @@
 package com.example.globaldemo.analytic
 
 import android.content.Context
-import android.text.TextUtils
 import android.util.Log
 import com.adjust.sdk.Adjust
 import com.adjust.sdk.AdjustAttribution
@@ -16,12 +15,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.util.regex.Pattern
 import kotlin.random.Random
 import kotlin.reflect.KClass
 
 object AdjustHelper {
     private const val TAG = "AdjustInitializer"
+    private var startTime = 0L
 
     fun startAttribute(context: Context, triggerType: KClass<out AdjustInitConfiguration>) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -45,8 +46,10 @@ object AdjustHelper {
                         }
                     }
                 }
+                startTime = System.currentTimeMillis()
                 Adjust.initSdk(adjustConfig)
                 updateAdIdIfNeeded()
+                // TODO: Adjust resume logic
             }
         }
     }
@@ -106,50 +109,75 @@ object AdjustHelper {
 
     private suspend fun onAttributeChanged(adjustAttribution: AdjustAttribution) {
         val verificationUseCase = GlobalDemoApplication.container.verificationUseCase
-        val channel = adjustAttribution.network?.trim() ?: ""
-        val adjustAttributionMap = mutableMapOf<String, String>()
+        val channel = adjustAttribution.network?.trim().orEmpty()
         if (channel.isNotEmpty()) {
-            adjustAttributionMap["channel"] = channel
             verificationUseCase.setChannel(channel)
         }
 
-        var campaign = adjustAttribution.campaign?.trim() ?: ""
+        var campaign = adjustAttribution.campaign?.trim().orEmpty()
+        var campaignId = ""
         if (campaign.isNotEmpty()) {
             if (campaign.contains("(") && campaign.endsWith(")")) {
-                var campaignId = ""
                 val p = Pattern.compile("\\((.*?)\\)")
                 val str = p.split(campaign)
                 val matcher = p.matcher(campaign)
                 if (matcher.find()) {
-                    campaignId = matcher.group(1)?.trim() ?: ""
+                    campaignId = matcher.group(1)?.trim().orEmpty()
                 }
                 if (str.isNotEmpty()) {
                     campaign = str[0].trim()
                 }
                 if (campaign.isNotEmpty()) {
-                    adjustAttributionMap["campaign"] = campaign
                     verificationUseCase.setCampaign(campaign)
                 }
                 if (campaignId.isNotEmpty()) {
-                    adjustAttributionMap["campaignid"] = campaignId
                     verificationUseCase.setCampaignId(campaignId)
                 }
             } else {
-                adjustAttributionMap["campaign"] = campaign
                 verificationUseCase.setCampaign(campaign)
             }
         }
+        reportToThinkingData(
+            channel = channel,
+            campaign = campaign,
+            campaignId = campaignId,
+            adGroup = adjustAttribution.adgroup?.trim().orEmpty(),
+            creative = adjustAttribution.creative?.trim().orEmpty()
+        )
+    }
 
-        if (!TextUtils.isEmpty(adjustAttribution.adgroup)) {
-            adjustAttributionMap["adgroup"] = adjustAttribution.adgroup
-        }
+    private fun reportToThinkingData(
+        channel: String = "",
+        campaign: String = "",
+        campaignId: String = "",
+        adGroup: String = "",
+        creative: String = ""
+    ) {
+        ThinkingDataHelper.updateSuperProperties(JSONObject().apply {
+            put("channel", channel)
+            put("campaign", campaign)
+            put("vc", BuildConfig.VERSION_CODE)
+            put("coins", LocalUserDataHelper.getUserCoins())
+            put("banknotes", LocalUserDataHelper.getUserMoney())
+        })
 
-        if (!TextUtils.isEmpty(adjustAttribution.creative)) {
-            adjustAttributionMap["creative"] = adjustAttribution.creative
-        }
+        ThinkingDataHelper.userSetOnce(JSONObject().apply {
+            put("channel", channel)
+            put("campaign", campaign)
+            put("campaignid", campaignId)
+            put("adgroup", adGroup)
+            put("creative", creative)
+            // TODO: fetch server_country
+            put("server_country", "not yet implemented")
+            put("vc", BuildConfig.VERSION_CODE)
+        })
 
-        Log.d(TAG, "onAttributeChanged() called with: adjustAttributionMap = $adjustAttributionMap")
-        // TODO report to thinking data
-
+        ThinkingDataHelper.userSet(JSONObject().apply {
+            put("coins", LocalUserDataHelper.getUserCoins())
+            put("banknotes", LocalUserDataHelper.getUserMoney())
+        })
+        ThinkingDataHelper.log("tenji_time", JSONObject().apply {
+            put("time", System.currentTimeMillis()-startTime)
+        })
     }
 }

@@ -23,6 +23,7 @@ class VerificationUseCase(val context: Context) {
     private val campaignId: Flow<String> = verificationRepository.campaignId
     val channel: Flow<String> = verificationRepository.channel
     val smId: Flow<String> = verificationRepository.smId
+    val userId: Flow<String> = verificationRepository.userId
 
     val uuid: String by lazy {
         val localUuid = runBlocking { verificationRepository.uuid.first() }

@@ -11,11 +11,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 object ThinkingDataHelper {
 
-    private const val TAG = "ThinkingDataAnalyticsManager"
+    private const val TAG = "dot_info"
+    private var hasInitialized = false
 
     fun initialize(context: Context) {
         Log.d(TAG, "initialize() called with: context = $context")
@@ -29,13 +30,14 @@ object ThinkingDataHelper {
             if (BuildConfig.DEBUG) mode = TDConfig.ModeEnum.DEBUG
         }
         TDAnalytics.init(config)
-
+        hasInitialized = true
         // Launch initialization tasks in a background coroutine
         CoroutineScope(Dispatchers.IO).launch {
-            initializeDistinctId()
+            initializeDistinctId()  // Initialize distinct ID
+            setUserId() // Set user ID
             TDAnalytics.enableAutoTrack(
                 TDAnalytics.TDAutoTrackEventType.APP_END or TDAnalytics.TDAutoTrackEventType.APP_INSTALL
-            )
+            )   // Enable auto-tracking for app end and install events
             Log.d(TAG, "initialize() called with: initialization completed")
         }
     }
@@ -57,14 +59,61 @@ object ThinkingDataHelper {
                 else -> verificationUseCase.uuid
             }
             TDAnalytics.setDistinctId(distinctId)
-            updateHasSetDistinctId(true)
+            verificationUseCase.updateHasSetDistinctId(true)
         }
     }
 
-    private suspend fun updateHasSetDistinctId(hasSetDistinctId: Boolean) =
-        withContext(Dispatchers.IO) {
-            val verificationUseCase = GlobalDemoApplication.container.verificationUseCase
-            verificationUseCase.updateHasSetDistinctId(hasSetDistinctId)
+
+    private suspend fun setUserId() {
+        val verificationUseCase = GlobalDemoApplication.container.verificationUseCase
+        val userId = verificationUseCase.userId.first()
+        if (userId.isNotEmpty()) TDAnalytics.login(userId)
+    }
+
+    fun updateSuperProperties(jsonObject: JSONObject) {
+        Log.d(TAG, "setSuperProperties() called with: jsonObject = $jsonObject")
+        TDAnalytics.setSuperProperties(jsonObject)
+    }
+
+    // call on SMId was fetched by SMHelper
+    fun updateSMId(smId: String) {
+        Log.d(TAG, "updateSMId() called with: smId = $smId")
+        if (!hasInitialized) {
+            Log.w(TAG, "updateSMId() has not been initialized")
+            return
         }
+        val jsonObject = JSONObject().apply {
+            put("sm_id", smId)
+            put("install_vc", BuildConfig.VERSION_CODE)
+        }
+        userSet(jsonObject)
+    }
+
+    fun log(eventKey: String, jsonObject: JSONObject, isForce: Boolean = false) {
+        Log.d(TAG, "log() called with: eventKey = $eventKey, jsonObject = $jsonObject, isForce = $isForce")
+        if (!hasInitialized) {
+            Log.w(TAG, "log() has not been initialized")
+            return
+        }
+        try {
+            TDAnalytics.track(eventKey, jsonObject)
+            if (isForce) TDAnalytics.flush()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun userSet(jsonObject: JSONObject) {
+        Log.d(TAG, "userSet() called with: jsonObject = $jsonObject")
+    }
+
+    fun userSetOnce(jsonObject: JSONObject) {
+        Log.d(TAG, "userSetOnce() called with: jsonObject = $jsonObject")
+        if (!hasInitialized) {
+            Log.w(TAG, "userSetOnce() has not been initialized")
+            return
+        }
+        TDAnalytics.userSetOnce(jsonObject)
+    }
 
 }
