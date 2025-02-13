@@ -24,19 +24,18 @@ object ThinkingDataHelper {
     private val eventQueue = ConcurrentLinkedQueue<Runnable>() // Use a thread-safe queue
 
     fun initialize(context: Context) {
-        Log.d(TAG, "initialize() called with: context = $context")
-
-        // Configure ThinkingData SDK
-        val config = TDConfig.getInstance(
-            context,
-            ApplicationConfiguration.THINKING_DATA_APP_ID,
-            ApplicationConfiguration.THINKING_DATA_SERVER_URL
-        ).apply {
-            if (BuildConfig.DEBUG) mode = TDConfig.ModeEnum.DEBUG
-        }
-        TDAnalytics.init(config)
-        // Launch initialization tasks in a background coroutine
         CoroutineScope(Dispatchers.IO).launch {
+            Log.d(TAG, "initialize() called with: context = $context")
+            // Configure ThinkingData SDK
+            val config = TDConfig.getInstance(
+                context,
+                ApplicationConfiguration.THINKING_DATA_APP_ID,
+                ApplicationConfiguration.THINKING_DATA_SERVER_URL
+            ).apply {
+                if (BuildConfig.DEBUG) mode = TDConfig.ModeEnum.DEBUG
+            }
+            TDAnalytics.init(config)
+            // Launch initialization tasks in a background coroutine
             initializeDistinctId()  // Initialize distinct ID,
             hasInitialized = true
             setUserId() // Set user ID
