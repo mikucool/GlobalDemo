@@ -25,9 +25,6 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     var videoAdShowTimes = 4
         private set
 
-    private var adLoadingCountDownTimer: CountDownTimer? = null
-    private var isLoadingTimeout = false
-
     fun preloadAllRewardAds(context: Context) {
         adControllers.forEach { controller ->
             controller.loadAllRewardVideoAds(
@@ -39,7 +36,12 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                             TAG,
                             "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
                         )
-                        loadRewardVideoAdsWithRetry(context, adFailureInformation.adId, controller, nextRetryCount)
+                        loadRewardVideoAdsWithRetry(
+                            context,
+                            adFailureInformation.adId,
+                            controller,
+                            nextRetryCount
+                        )
                     }
                 }
             )
@@ -73,17 +75,39 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     }
 
 
-    fun displayRewardedAd(activity: Activity, onTimeout: () -> Unit = {}) {
+    fun displayRewardedAd(
+        activity: Activity,
+        onAdNotAvailableAtFirst: () -> Unit,
+        onAdNotAvailableAfter3Second: () -> Unit
+    ) {
         val highestRevenueAdController =
             adControllers.maxByOrNull { it.getHighestRewardAdRevenue() }
-        if (highestRevenueAdController != null) {
+        if (highestRevenueAdController != null && highestRevenueAdController.getHighestRewardAdRevenue() > 0) {
             highestRevenueAdController.displayHighestRevenueRewardVideoAd(activity)
         } else {
-            loadRewardedAdsWithTimeout(
-                context = activity,
-                onAdAvailable = { displayRewardedAd(activity) },
-                onTimeout = onTimeout
-            )
+            onAdNotAvailableAtFirst.invoke()
+            displayHighestVideoAdAfter3Seconds(activity, onAdNotAvailableAfter3Second)
+        }
+    }
+
+    private fun displayHighestVideoAdAfter3Seconds(
+        activity: Activity,
+        onAdNotAvailable: () -> Unit
+    ) {
+        val highestRevenueAdController =
+            adControllers.maxByOrNull { it.getHighestRewardAdRevenue() }
+        object : CountDownTimer(3000, 1000) {
+            override fun onTick(p0: Long) {
+            }
+
+            override fun onFinish() {
+                if (highestRevenueAdController != null) {
+                    highestRevenueAdController.displayHighestRevenueRewardVideoAd(activity)
+                } else {
+                    // throw exception to outer for callback
+                    onAdNotAvailable.invoke()
+                }
+            }
         }
     }
 
@@ -97,39 +121,6 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
         maxController?.displayHighestRevenueInterstitialAd(activity)
     }
 
-    private fun loadRewardedAdsWithTimeout(
-        context: Context,
-        onAdAvailable: () -> Unit = {},
-        onTimeout: () -> Unit = {}
-    ) {
-        isLoadingTimeout = false
-        adLoadingCountDownTimer = object : CountDownTimer(AD_LOADING_TIMEOUT, 1000) {
-            override fun onTick(p0: Long) {
-                Log.d(TAG, "onTick() called with: p0 = $p0")
-            }
-
-            override fun onFinish() {
-                isLoadingTimeout = true
-                Log.e(TAG, "adLoadingCountDownTimer onFinish() called, Timeout!")
-                onTimeout.invoke()
-            }
-
-        }
-        adControllers.forEach { controller ->
-            controller.loadAllRewardVideoAds(
-                context,
-                eachRewardAdCallback = object : RewardAdCallback {
-                    override fun onLoaded() {
-                        if (!isLoadingTimeout && adLoadingCountDownTimer != null) {
-                            adLoadingCountDownTimer?.cancel()
-                            adLoadingCountDownTimer = null
-                            onAdAvailable.invoke()
-                        }
-                    }
-                })
-        }
-    }
-
     private suspend fun getAdControllers(): List<BiddingAdController> = coroutineScope {
         val deferredConfigs = listOf(
             async { appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.BIGO) },
@@ -141,9 +132,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     }
 
     companion object {
-        private const val AD_LOADING_TIMEOUT = 3000L
         private const val MAX_LOAD_TIMES = 5
         const val TAG = "AdManager"
-
     }
 }
