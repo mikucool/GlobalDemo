@@ -44,7 +44,7 @@ android {
 
         debug {
             isMinifyEnabled = false
-//            signingConfig = signingConfigs["release"]
+            signingConfig = signingConfigs["release"]
             isDebuggable = true
         }
     }
