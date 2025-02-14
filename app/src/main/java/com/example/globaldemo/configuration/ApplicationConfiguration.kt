@@ -17,6 +17,8 @@ object ApplicationConfiguration {
     const val AD_MAX_REWARD_ID_2 = "334fa2a00d17dcf4"
     const val AD_MAX_INTERSTITIAL_ID_1 = "619f75501965fcec"
     const val AD_MAX_INTERSTITIAL_ID_2 = "21f81e81c1ebafe7"
+
+    const val AD_MOB_INTERSTITIAL_ID_1 = "ca-app-pub-3940256099942544/1033173712"
     /** ad configuration end **/
 
     const val THINKING_DATA_APP_ID = "a511b1353d7947118d237d676f9d74f4"

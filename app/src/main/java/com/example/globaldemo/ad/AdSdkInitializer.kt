@@ -6,9 +6,14 @@ import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.example.globaldemo.configuration.ApplicationConfiguration
+import com.google.android.gms.ads.MobileAds
+import com.kwai.network.a.it
 import com.kwai.network.sdk.KwaiAdSDK
 import com.kwai.network.sdk.api.KwaiInitCallback
 import com.kwai.network.sdk.api.SdkConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import sg.bigo.ads.BigoAdSdk
 import sg.bigo.ads.api.AdConfig
 
@@ -55,6 +60,14 @@ object AdSdkInitializer {
         AppLovinSdk.getInstance(context).initialize(initConfig) { sdkConfig ->
             Log.d(TAG, "initMaxAd() called with: sdkConfig = $sdkConfig")
             updateMaxAdUserSettings(context)
+        }
+    }
+
+    fun initAdMob(context: Context) {
+        CoroutineScope(Dispatchers.IO).launch {
+            MobileAds.initialize(context) { status ->
+                Log.d(TAG, "initAdMob() called with: init status = ${status.adapterStatusMap}")
+            }
         }
     }
 

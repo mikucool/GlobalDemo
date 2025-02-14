@@ -1,5 +1,5 @@
 package com.example.globaldemo.ad.constant
 
 enum class AdPlatform {
-    MAX, BIGO, KWAI, NONE
+    MAX, BIGO, KWAI, ADMOB, NONE
 }

@@ -59,5 +59,17 @@ object LocalDataProvider {
                 AdType.NATIVE to listOf()
             )
         ),
+        // admob
+        AdConfiguration(
+            adPlatform = AdPlatform.ADMOB,
+            adIdListMap = mapOf(
+                AdType.REWARD to listOf(),
+                AdType.INTERSTITIAL to listOf(
+                    ApplicationConfiguration.AD_MOB_INTERSTITIAL_ID_1
+                ),
+                AdType.BANNER to listOf(),
+                AdType.NATIVE to listOf()
+            )
+        )
     )
 }

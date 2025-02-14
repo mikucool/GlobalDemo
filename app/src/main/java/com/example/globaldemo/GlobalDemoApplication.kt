@@ -26,6 +26,7 @@ class GlobalDemoApplication : Application() {
         AdSdkInitializer.initKwaiAd(this)
         AdSdkInitializer.initBigoAd(this)
         AdSdkInitializer.initMaxAd(this)
+        AdSdkInitializer.initAdMob(this)
         ThinkingDataHelper.initialize(this)
         SMHelper.initialize(this)
         AdjustHelper.startAttribute(context = this, AdjustInitConfiguration.OnAppStart::class)

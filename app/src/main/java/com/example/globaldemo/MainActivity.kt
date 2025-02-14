@@ -29,11 +29,11 @@ class MainActivity : FragmentActivity() {
         enableEdgeToEdge()
         setContent {
             GlobalDemoTheme {
-                /*InterstitialAdPlatformTestScreen(
+                InterstitialAdPlatformTestScreen(
                     modifier = Modifier.fillMaxSize(),
                     biddingAdControllers = controllers
-                )*/
-                NetworkTestScreen()
+                )
+//                NetworkTestScreen()
             }
         }
     }
@@ -43,7 +43,8 @@ class MainActivity : FragmentActivity() {
         val deferredConfigs = listOf(
             async { appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.BIGO) },
             async { appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.KWAI) },
-            async { appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.MAX) }
+            async { appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.MAX) },
+            async { appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.ADMOB) }
         )
         val adConfigurations = deferredConfigs.awaitAll()
         return@coroutineScope AdControllerFactory.generateAdControllers(adConfigurations)
