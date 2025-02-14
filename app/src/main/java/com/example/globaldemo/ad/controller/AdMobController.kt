@@ -11,6 +11,7 @@ import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.OnPaidEventListener
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 
@@ -36,6 +37,9 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
                     Log.d(TAG, "onAdLoaded() called with: p0 = $p0")
                     super.onAdLoaded(p0)
                     interstitialAd = p0
+                    interstitialAd?.onPaidEventListener = OnPaidEventListener {
+                        Log.d(TAG, "onAdPaid() called with: p0 = $it")
+                    }
                     callback.onLoaded()
                 }
 
@@ -60,6 +64,7 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
                 // Called when ad is dismissed.
                 Log.d(TAG, "Ad dismissed fullscreen content.")
                 interstitialAd = null
+                loadInterstitialAds(activity)
             }
 
             override fun onAdFailedToShowFullScreenContent(p0: AdError) {
@@ -67,6 +72,7 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
                 // Called when ad fails to show.
                 Log.d(TAG, "Ad failed to show fullscreen content.")
                 interstitialAd = null
+                loadInterstitialAds(activity)
             }
 
             override fun onAdImpression() {
@@ -84,6 +90,7 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
             interstitialAd?.show(activity)
         } else {
             Log.d(TAG, "The interstitial ad wasn't ready yet.")
+            loadInterstitialAds(activity)
         }
     }
 
