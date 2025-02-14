@@ -9,6 +9,7 @@ import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.ad.controller.BiddingAdController
 import com.example.globaldemo.domain.AppDataSourceUseCase
+import com.example.globaldemo.model.AdFailureInformation
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -28,8 +29,49 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     private var isLoadingTimeout = false
 
     fun preloadAllRewardAds(context: Context) {
-        adControllers.forEach { controller -> controller.loadRewardVideoAds(context) }
+        adControllers.forEach { controller ->
+            controller.loadAllRewardVideoAds(
+                context,
+                eachRewardAdCallback = object : RewardAdCallback {
+                    override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
+                        val nextRetryCount = 2
+                        Log.d(
+                            TAG,
+                            "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                        )
+                        loadRewardVideoAdsWithRetry(context, adFailureInformation.adId, controller, nextRetryCount)
+                    }
+                }
+            )
+        }
     }
+
+    private fun loadRewardVideoAdsWithRetry(
+        context: Context,
+        adId: String,
+        controller: BiddingAdController,
+        retryCount: Int
+    ) {
+        if (retryCount > MAX_LOAD_TIMES) {
+            Log.e(TAG, "Failed to load reward ads after $MAX_LOAD_TIMES attempts.")
+            return // Stop retrying
+        }
+        controller.loadSpecificRewardVideoAd(
+            context,
+            adId,
+            callback = object : RewardAdCallback {
+                override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
+                    val nextRetryCount = retryCount + 1
+                    Log.d(
+                        TAG,
+                        "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                    )
+                    loadRewardVideoAdsWithRetry(context, adId, controller, nextRetryCount)
+                }
+            }
+        )
+    }
+
 
     fun displayRewardedAd(activity: Activity, onTimeout: () -> Unit = {}) {
         val highestRevenueAdController =
@@ -74,15 +116,17 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
 
         }
         adControllers.forEach { controller ->
-            controller.loadRewardVideoAds(context, callback = object : RewardAdCallback {
-                override fun onLoaded() {
-                    if (!isLoadingTimeout && adLoadingCountDownTimer != null) {
-                        adLoadingCountDownTimer?.cancel()
-                        adLoadingCountDownTimer = null
-                        onAdAvailable.invoke()
+            controller.loadAllRewardVideoAds(
+                context,
+                eachRewardAdCallback = object : RewardAdCallback {
+                    override fun onLoaded() {
+                        if (!isLoadingTimeout && adLoadingCountDownTimer != null) {
+                            adLoadingCountDownTimer?.cancel()
+                            adLoadingCountDownTimer = null
+                            onAdAvailable.invoke()
+                        }
                     }
-                }
-            })
+                })
         }
     }
 
@@ -98,7 +142,8 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
 
     companion object {
         private const val AD_LOADING_TIMEOUT = 3000L
-        const val TAG = "AdUseCase"
+        private const val MAX_LOAD_TIMES = 5
+        const val TAG = "AdManager"
 
     }
 }

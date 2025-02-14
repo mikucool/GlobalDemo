@@ -13,10 +13,12 @@ interface BiddingAdController {
         callback: InterstitialAdCallback = object : InterstitialAdCallback {}
     )
 
-    fun loadRewardVideoAds(
+    fun loadAllRewardVideoAds(
         context: Context,
-        callback: RewardAdCallback = object : RewardAdCallback {}
+        eachRewardAdCallback: RewardAdCallback = object : RewardAdCallback {}
     )
+
+    fun loadSpecificRewardVideoAd(context: Context, adId: String, callback: RewardAdCallback) = Unit
 
     fun displayHighestRevenueInterstitialAd(activity: Activity)
     fun displayHighestRevenueRewardVideoAd(activity: Activity)

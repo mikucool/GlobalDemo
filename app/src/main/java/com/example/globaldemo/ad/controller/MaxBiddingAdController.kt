@@ -14,6 +14,7 @@ import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.model.AdConfiguration
+import com.example.globaldemo.model.AdFailureInformation
 
 class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : BiddingAdController {
     private val rewardAdsMap: MutableMap<String, MaxRewardAdWrapper?> by lazy {
@@ -69,48 +70,63 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
         }
     }
 
-    override fun loadRewardVideoAds(context: Context, callback: RewardAdCallback) {
+    override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: RewardAdCallback) {
         rewardAdsMap.forEach { (adId, rewardAd) ->
-            if (rewardAd == null) {
-                val rewardedAd = MaxRewardedAd.getInstance(adId, context)
-                rewardedAd.setListener(object : MaxRewardedAdListener {
-                    override fun onAdLoaded(p0: MaxAd) {
-                        rewardAdsMap[adId] = MaxRewardAdWrapper(rewardedAd, p0.revenue)
-                        Log.d(TAG, "onAdLoaded() called with: p0 = $p0")
-                        callback.onLoaded()
-                    }
+            if (rewardAd == null) loadSpecificRewardVideoAd(context, adId, eachRewardAdCallback)
+        }
+    }
 
-                    override fun onAdDisplayed(p0: MaxAd) {
-                        Log.d(TAG, "onAdDisplayed() called with: p0 = $p0")
-                        callback.onDisplayed()
-                    }
+    override fun loadSpecificRewardVideoAd(
+        context: Context,
+        adId: String,
+        callback: RewardAdCallback
+    ) {
+        val specificRewardAd = rewardAdsMap[adId]
+        if (specificRewardAd == null) {
+            val maxRewardAd = MaxRewardedAd.getInstance(adId, context)
+            maxRewardAd.setListener(object : MaxRewardedAdListener {
+                override fun onAdLoaded(p0: MaxAd) {
+                    rewardAdsMap[adId] = MaxRewardAdWrapper(maxRewardAd, p0.revenue)
+                    Log.d(TAG, "onAdLoaded() called with: p0 = $p0")
+                    callback.onLoaded()
+                }
 
-                    override fun onAdHidden(p0: MaxAd) {
-                        Log.d(TAG, "onAdHidden() called with: p0 = $p0")
-                    }
+                override fun onAdDisplayed(p0: MaxAd) {
+                    Log.d(TAG, "onAdDisplayed() called with: p0 = $p0")
+                    callback.onDisplayed()
+                }
 
-                    override fun onAdClicked(p0: MaxAd) {
-                        Log.d(TAG, "onAdClicked() called with: p0 = $p0")
-                        callback.onClicked()
-                    }
+                override fun onAdHidden(p0: MaxAd) {
+                    Log.d(TAG, "onAdHidden() called with: p0 = $p0")
+                }
 
-                    override fun onAdLoadFailed(p0: String, p1: MaxError) {
-                        Log.d(TAG, "onAdLoadFailed() called with: p0 = $p0, p1 = $p1")
-                        callback.onFailedToLoad()
-                    }
+                override fun onAdClicked(p0: MaxAd) {
+                    Log.d(TAG, "onAdClicked() called with: p0 = $p0")
+                    callback.onClicked()
+                }
 
-                    override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
-                        Log.d(TAG, "onAdDisplayFailed() called with: p0 = $p0, p1 = $p1")
-                        callback.onFailedToDisplay()
-                    }
+                override fun onAdLoadFailed(p0: String, p1: MaxError) {
+                    Log.d(TAG, "onAdLoadFailed() called with: p0 = $p0, p1 = $p1")
+                    callback.onFailedToLoad(
+                        AdFailureInformation(
+                            platform = adConfiguration.adPlatform,
+                            adId = adId,
+                            adType = AdType.REWARD
+                        )
+                    )
+                }
 
-                    override fun onUserRewarded(p0: MaxAd, p1: MaxReward) {
-                        Log.d(TAG, "onUserRewarded() called with: p0 = $p0, p1 = $p1")
-                        callback.onRewarded()
-                    }
-                })
-                rewardedAd.loadAd()
-            }
+                override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
+                    Log.d(TAG, "onAdDisplayFailed() called with: p0 = $p0, p1 = $p1")
+                    callback.onFailedToDisplay()
+                }
+
+                override fun onUserRewarded(p0: MaxAd, p1: MaxReward) {
+                    Log.d(TAG, "onUserRewarded() called with: p0 = $p0, p1 = $p1")
+                    callback.onRewarded()
+                }
+            })
+            maxRewardAd.loadAd()
         }
     }
 

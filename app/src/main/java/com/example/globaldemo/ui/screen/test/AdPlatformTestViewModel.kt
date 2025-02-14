@@ -8,6 +8,7 @@ import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.ad.constant.InterstitialAdState
 import com.example.globaldemo.ad.constant.RewardAdState
+import com.example.globaldemo.model.AdFailureInformation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -29,14 +30,14 @@ class AdPlatformTestViewModel : ViewModel() {
 
     fun loadRewardAd(context: Context, biddingAdController: BiddingAdController) {
         updateRewardAdState(RewardAdState.LOADING)
-        biddingAdController.loadRewardVideoAds(context, object : RewardAdCallback {
+        biddingAdController.loadAllRewardVideoAds(context, object : RewardAdCallback {
             override fun onLoaded() {
                 super.onLoaded()
                 updateRewardAdState(RewardAdState.LOADED)
             }
 
-            override fun onFailedToLoad() {
-                super.onFailedToLoad()
+            override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
+                super.onFailedToLoad(adFailureInformation)
                 updateRewardAdState(RewardAdState.LOAD_ERROR)
             }
 

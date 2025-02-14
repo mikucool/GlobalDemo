@@ -94,7 +94,7 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
         }
     }
 
-    override fun loadRewardVideoAds(context: Context, callback: RewardAdCallback) {
+    override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: RewardAdCallback) {
         throw UnsupportedOperationException("AdMob does not support this operation")
     }
 

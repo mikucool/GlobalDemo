@@ -10,6 +10,7 @@ import com.example.globaldemo.GlobalDemoApplication.Companion.container
 import com.example.globaldemo.ad.AdControllerFactory
 import com.example.globaldemo.ad.controller.BiddingAdController
 import com.example.globaldemo.ad.constant.AdPlatform
+import com.example.globaldemo.ui.screen.test.BiddingAdTestScreen
 import com.example.globaldemo.ui.screen.test.InterstitialAdPlatformTestScreen
 import com.example.globaldemo.ui.screen.test.NetworkTestScreen
 import com.example.globaldemo.ui.screen.test.RewardAdPlatformTestScreen
@@ -29,10 +30,15 @@ class MainActivity : FragmentActivity() {
         enableEdgeToEdge()
         setContent {
             GlobalDemoTheme {
-                InterstitialAdPlatformTestScreen(
+                /*InterstitialAdPlatformTestScreen(
                     modifier = Modifier.fillMaxSize(),
                     biddingAdControllers = controllers
-                )
+                )*/
+                /*RewardAdPlatformTestScreen(
+                    modifier = Modifier.fillMaxSize(),
+                    biddingAdControllers = controllers
+                )*/
+                BiddingAdTestScreen()
 //                NetworkTestScreen()
             }
         }
