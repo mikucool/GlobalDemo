@@ -17,13 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.globaldemo.domain.AdUseCase
+import com.example.globaldemo.ad.AdManager
 import com.example.globaldemo.ad.constant.RewardAdState
 
 @Composable
 fun BiddingAdTestScreen(
     modifier: Modifier = Modifier,
-    adUseCase: AdUseCase = AdUseCase(),
+    adManager: AdManager = AdManager(),
     viewModel: BiddingAdTestViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -43,10 +43,10 @@ fun BiddingAdTestScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Button(onClick = { viewModel.loadAd(context, adUseCase) }) {
+                Button(onClick = { viewModel.loadAd(context, adManager) }) {
                     Text(text = "Load Ad")
                 }
-                Button(onClick = { viewModel.displayRewardedAd(context as Activity, adUseCase) }) {
+                Button(onClick = { viewModel.displayRewardedAd(context as Activity, adManager) }) {
                     Text(text = "Show Ad")
                 }
             }

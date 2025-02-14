@@ -75,7 +75,7 @@ object AdjustHelper {
 
     private suspend fun checkAdjustInitConfig(triggerType: KClass<out AdjustInitConfiguration>): Boolean {
         val appDataSourceUseCase = GlobalDemoApplication.container.appDataSourceUseCase
-        val adUseCase = GlobalDemoApplication.container.adUseCase
+        val adUseCase = GlobalDemoApplication.container.adManager
         val adjustInitConfig = appDataSourceUseCase.fetchAdjustInitConfig()
         Log.d(
             TAG,

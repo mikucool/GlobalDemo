@@ -7,7 +7,6 @@ import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.example.globaldemo.configuration.ApplicationConfiguration
 import com.google.android.gms.ads.MobileAds
-import com.kwai.network.a.it
 import com.kwai.network.sdk.KwaiAdSDK
 import com.kwai.network.sdk.api.KwaiInitCallback
 import com.kwai.network.sdk.api.SdkConfig

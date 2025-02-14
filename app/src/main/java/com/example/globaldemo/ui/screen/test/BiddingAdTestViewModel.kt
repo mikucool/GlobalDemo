@@ -3,7 +3,7 @@ package com.example.globaldemo.ui.screen.test
 import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.example.globaldemo.domain.AdUseCase
+import com.example.globaldemo.ad.AdManager
 import com.example.globaldemo.ad.constant.RewardAdState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,13 +16,13 @@ class BiddingAdTestViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(rewardAdState = rewardAdState)
     }
 
-    fun loadAd(context: Context, adUseCase: AdUseCase) {
+    fun loadAd(context: Context, adManager: AdManager) {
         updateRewardAdState(RewardAdState.LOADING)
-        adUseCase.preloadAllRewardAds(context)
+        adManager.preloadAllRewardAds(context)
     }
 
-    fun displayRewardedAd(activity: Activity, adUseCase: AdUseCase) {
-        adUseCase.displayRewardedAd(
+    fun displayRewardedAd(activity: Activity, adManager: AdManager) {
+        adManager.displayRewardedAd(
             activity,
             onTimeout = { updateRewardAdState(RewardAdState.LOAD_ERROR) }
         )
