@@ -7,6 +7,7 @@ bigoAds = "5.1.0"
 converterGson = "2.9.0"
 datastorePreferences = "1.1.2"
 dusdk = "8.0.9"
+firebaseBom = "33.9.0"
 gson = "2.10.1"
 installreferrer = "2.2"
 kotlin = "2.0.0"
@@ -40,6 +41,9 @@ applovin-sdk = { module = "com.applovin:applovin-sdk", version.ref = "applovinSd
 bigo-ads = { module = "com.bigossp:bigo-ads", version.ref = "bigoAds" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 dusdk = { module = "cn.shuzilm.core:dusdk", version.ref = "dusdk" }
+firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 installreferrer = { module = "com.android.installreferrer:installreferrer", version.ref = "installreferrer" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

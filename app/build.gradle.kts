@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 //    id("applovin-quality-service")
 }
 /*applovin {
@@ -104,6 +105,10 @@ dependencies {
     implementation(libs.bigo.ads)
     // max
     implementation(libs.applovin.sdk)
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
     // thinking data
     implementation(libs.thinkinganalyticssdk)
     // 数盟
