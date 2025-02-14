@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "12611277218291",
+    "project_id": "happy-fish-4cc5a",
+    "storage_bucket": "happy-fish-4cc5a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:12611277218291:android:8784db935c48016e4ded8d",
+        "android_client_info": {
+          "package_name": "org.cocos2dx.emo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "12611277218291-cbbb67ku8o2q9f0o0d2ert4daor9evj0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrZqSh5t0KGHlWQ3J_8wN35V7VsPhCDQe"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "12611277218291-cbbb67ku8o2q9f0o0d2ert4daor9evj0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
