@@ -30,6 +30,7 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
     }
 
     override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: RewardAdCallback) {
+        Log.i(TAG, "loadRewardVideoAds() called with: adConfiguration = $adConfiguration")
         videoAdsMap.forEach { (adId, adWrapper) ->
             if (adWrapper.adType == AdType.REWARD && adWrapper.adInstance == null) {
                 loadSpecificRewardVideoAd(context, adId, eachRewardAdCallback)
@@ -52,7 +53,7 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
                         }
 
                         override fun onAdLoadFailed(p0: String?, p1: KwaiError) {
-                            Log.d(TAG, "onAdLoadFailed() called with: p0 = $p0, p1 = $p1")
+                            Log.e(TAG, "onAdLoadFailed() called with: p0 = $p0, p1 = $p1")
                             callback.onFailedToLoad(
                                 AdFailureInformation(
                                     platform = adConfiguration.adPlatform,
@@ -87,7 +88,7 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
                             adType = AdType.REWARD,
                             adId = adId
                         )
-                        Log.d(TAG, "onAdShowFailed() called with: p0 = $p0")
+                        Log.e(TAG, "onAdShowFailed() called with: p0 = $p0")
                         callback.onFailedToDisplay()
                     }
 

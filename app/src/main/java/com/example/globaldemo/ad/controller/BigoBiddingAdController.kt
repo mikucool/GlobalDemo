@@ -28,10 +28,7 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
     }
 
     override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: RewardAdCallback) {
-        Log.i(
-            TAG,
-            "loadRewardVideoAds() called with: callback = $eachRewardAdCallback, adConfiguration = $adConfiguration"
-        )
+        Log.i(TAG, "loadRewardVideoAds() called with: adConfiguration = $adConfiguration")
         videoAdsMap.forEach { (adId, adWrapper) ->
             if (adWrapper.adType == AdType.REWARD && adWrapper.adInstance == null) {
                 loadSpecificRewardVideoAd(context, adId, eachRewardAdCallback)
@@ -52,7 +49,7 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
             val loader = RewardVideoAdLoader.Builder()
                 .withAdLoadListener(object : AdLoadListener<RewardVideoAd> {
                     override fun onError(p0: AdError) {
-                        Log.d(TAG, "onError() called with: p0 = ${p0.message}")
+                        Log.e(TAG, "onError() called with: p0 = ${p0.message}")
                         callback.onFailedToLoad(
                             AdFailureInformation(
                                 platform = adConfiguration.adPlatform,
@@ -71,11 +68,11 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
                             adInstance = p0,
                             isLoaded = true
                         )
-                        Log.d(TAG, "onAdLoaded() called with: ad = ${videoAdsMap[adId]}")
+                        Log.i(TAG, "onAdLoaded() called with: ad = ${videoAdsMap[adId]}")
                         p0.setAdInteractionListener(object :
                             RewardAdInteractionListener {
                             override fun onAdError(p0: AdError) {
-                                Log.d(TAG, "onAdError() called with: p0 = $p0")
+                                Log.e(TAG, "onAdError() called with: p0 = $p0")
                                 videoAdsMap[adId] = AdWrapper(
                                     adPlatform = adConfiguration.adPlatform,
                                     adType = AdType.REWARD,

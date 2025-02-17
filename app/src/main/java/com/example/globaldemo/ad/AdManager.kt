@@ -10,7 +10,9 @@ import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.ad.constant.AdType
+import com.example.globaldemo.ad.controller.AdWrapper
 import com.example.globaldemo.ad.controller.BiddingAdController
+import com.example.globaldemo.ad.utils.AdInfoLogUtil
 import com.example.globaldemo.domain.AppDataSourceUseCase
 import com.example.globaldemo.model.AdFailureInformation
 import kotlinx.coroutines.async
@@ -29,11 +31,30 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     var videoAdShowTimes = 4
         private set
 
-    fun preloadAllRewardAds(context: Context) {
+    fun loadAllVideoAds(context: Context) {
         adControllers.forEach { controller ->
             controller.loadAllRewardVideoAds(
-                context,
+                context = context,
                 eachRewardAdCallback = object : RewardAdCallback {
+                    override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
+                        val nextRetryCount = 2
+                        Log.e(
+                            TAG,
+                            "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                        )
+                        loadRewardVideoAdWithRetry(
+                            context,
+                            adFailureInformation.adId,
+                            adFailureInformation.adType,
+                            controller,
+                            nextRetryCount
+                        )
+                    }
+                }
+            )
+            controller.loadAllInterstitialAds(
+                context = context,
+                eachInterstitialAdCallback = object : InterstitialAdCallback {
                     override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
                         val nextRetryCount = 2
                         Log.d(
@@ -65,14 +86,17 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
         controller: BiddingAdController,
         retryCount: Int
     ) {
+        Log.w(TAG, "loadRewardVideoAdWithRetry() called with: retryCount = $retryCount, " +
+                "ad = ${controller.getAdWrapperById(adId)},")
         if (retryCount > MAX_LOAD_TIMES) {
-            Log.e(TAG, "Failed to load reward ads after $MAX_LOAD_TIMES attempts.")
-            if (checkIfAnyVideoAdReady()) {
+            Log.e(TAG, "Failed to load reward ads after $MAX_LOAD_TIMES attempts, current retry count: $retryCount.")
+            if (checkIfAnyVideoAdLoaded()) {
                 adLoadingStatusMap[adId] = FailureAdLoadingStatus(
                     adId = adId,
                     adType = adType,
                     retryCount = retryCount
                 )
+                Log.d(TAG, "save adLoadingStatus: ${adLoadingStatusMap[adId]}")
                 return
             } else {
                 val delayTime = getDelayTime(retryCount)
@@ -85,11 +109,17 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                                 callback = object : RewardAdCallback {
                                     override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
                                         val nextRetryCount = retryCount + 1
-                                        Log.d(
+                                        Log.e(
                                             TAG,
-                                            "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                                            "onFailedToLoad() called with: adFailureInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
                                         )
-                                        loadRewardVideoAdWithRetry(context, adId, adType, controller, nextRetryCount)
+                                        loadRewardVideoAdWithRetry(
+                                            context,
+                                            adId,
+                                            adType,
+                                            controller,
+                                            nextRetryCount
+                                        )
                                     }
 
                                     override fun onLoaded() {
@@ -107,11 +137,17 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                                 callback = object : InterstitialAdCallback {
                                     override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
                                         val nextRetryCount = retryCount + 1
-                                        Log.d(
+                                        Log.e(
                                             TAG,
-                                            "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                                            "onFailedToLoad() called with: adFailureInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
                                         )
-                                        loadRewardVideoAdWithRetry(context, adId, adType, controller, nextRetryCount)
+                                        loadRewardVideoAdWithRetry(
+                                            context,
+                                            adId,
+                                            adType,
+                                            controller,
+                                            nextRetryCount
+                                        )
                                     }
 
                                     override fun onLoaded() {
@@ -135,11 +171,17 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                         callback = object : RewardAdCallback {
                             override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
                                 val nextRetryCount = retryCount + 1
-                                Log.d(
+                                Log.e(
                                     TAG,
-                                    "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                                    "onFailedToLoad() called with: adFailureInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
                                 )
-                                loadRewardVideoAdWithRetry(context, adId, adType, controller, nextRetryCount)
+                                loadRewardVideoAdWithRetry(
+                                    context,
+                                    adId,
+                                    adType,
+                                    controller,
+                                    nextRetryCount
+                                )
                             }
                         }
                     )
@@ -152,11 +194,17 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                         callback = object : InterstitialAdCallback {
                             override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
                                 val nextRetryCount = retryCount + 1
-                                Log.d(
+                                Log.e(
                                     TAG,
-                                    "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                                    "onFailedToLoad() called with: adFailureInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
                                 )
-                                loadRewardVideoAdWithRetry(context, adId, adType, controller, nextRetryCount)
+                                loadRewardVideoAdWithRetry(
+                                    context,
+                                    adId,
+                                    adType,
+                                    controller,
+                                    nextRetryCount
+                                )
                             }
                         }
                     )
@@ -168,17 +216,13 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
         }
     }
 
-    private fun checkIfAnyVideoAdReady(): Boolean {
+    private fun checkIfAnyVideoAdLoaded(): Boolean {
+        Log.d(TAG, "checkIfAnyVideoAdLoaded() called")
+        AdInfoLogUtil.logControllersAdInfo(TAG, adControllers)
         adControllers.forEach { controller ->
-            Log.i(
-                TAG,
-                "checkIfAnyVideoAdReady() called with: videoAdsMap = ${controller.videoAdsMap}"
-            )
-            controller.videoAdsMap.values.forEach { adWrapper ->
-                val isAdNull = adWrapper.adInstance == null
-                val isAdLoaded = adWrapper.isLoaded
-                if (!isAdNull && isAdLoaded) return true
-            }
+            // get count of adInstance != null
+            val count = controller.videoAdsMap.count { it.value.adInstance != null }
+            if (count > 0) return true
         }
         return false
     }
@@ -269,6 +313,10 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     private fun findBestAdController(): BiddingAdController? {
         val adController = adControllers.maxByOrNull { it.getBestAd()?.adRevenue ?: 0.0 }
         return if ((adController?.getBestAd()?.adRevenue ?: 0.0) > 0) adController else null
+    }
+
+    private fun BiddingAdController.getAdWrapperById(adId: String): AdWrapper? {
+        return this.videoAdsMap[adId]
     }
 
     companion object {

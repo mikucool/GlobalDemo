@@ -65,7 +65,7 @@ class AdPlatformTestViewModel : ViewModel() {
     }
 
     fun loadInterstitialAd(context: Context, biddingAdController: BiddingAdController) {
-        updateInterstitialAdState(InterstitialAdState.LOADING)
+        biddingAdController.loadAllInterstitialAds(context)
     }
 
     data class AdTestUiState(

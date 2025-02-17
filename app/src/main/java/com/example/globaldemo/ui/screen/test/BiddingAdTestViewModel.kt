@@ -18,7 +18,7 @@ class BiddingAdTestViewModel : ViewModel() {
 
     fun loadAd(context: Context, adManager: AdManager) {
         updateRewardAdState(RewardAdState.LOADING)
-        adManager.preloadAllRewardAds(context)
+        adManager.loadAllVideoAds(context)
     }
 
     fun displayRewardedAd(activity: Activity, adManager: AdManager) {
