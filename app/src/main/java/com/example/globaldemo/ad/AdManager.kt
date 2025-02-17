@@ -77,8 +77,8 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
 
     fun displayRewardedAd(
         activity: Activity,
-        onAdNotAvailableAtFirst: () -> Unit,
-        onAdNotAvailableAfter3Second: () -> Unit
+        onAdNotAvailableAtFirst: () -> Unit = {},
+        onAdNotAvailableAfter3Second: () -> Unit = {}
     ) {
         val highestRevenueAdController =
             adControllers.maxByOrNull { it.getHighestRewardAdRevenue() }
@@ -104,7 +104,6 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                 if (highestRevenueAdController != null) {
                     highestRevenueAdController.displayHighestRevenueRewardVideoAd(activity)
                 } else {
-                    // throw exception to outer for callback
                     onAdNotAvailable.invoke()
                 }
             }
