@@ -3,7 +3,6 @@ package com.example.globaldemo.ad.controller
 import android.app.Activity
 import android.content.Context
 import android.util.Log
-import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.model.AdConfiguration

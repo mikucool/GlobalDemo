@@ -7,6 +7,7 @@ import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.model.AdConfiguration
+import com.example.globaldemo.model.AdFailureInformation
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -50,7 +51,13 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
                 override fun onAdFailedToLoad(p0: LoadAdError) {
                     Log.d(TAG, "onAdFailedToLoad() called with: p0 = $p0")
                     super.onAdFailedToLoad(p0)
-                    callback.onFailedToLoad()
+                    callback.onFailedToLoad(
+                        AdFailureInformation(
+                            platform = adConfiguration.adPlatform,
+                            adId = interstitialAdId,
+                            adType = AdType.INTERSTITIAL
+                        )
+                    )
                 }
 
             }

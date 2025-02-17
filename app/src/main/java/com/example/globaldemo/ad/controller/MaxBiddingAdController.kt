@@ -172,7 +172,13 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
 
                 override fun onAdLoadFailed(p0: String, p1: MaxError) {
                     Log.d(TAG, "onAdLoadFailed() called with: p0 = $p0, p1 = $p1")
-                    callback.onFailedToLoad()
+                    callback.onFailedToLoad(
+                        AdFailureInformation(
+                            platform = adConfiguration.adPlatform,
+                            adId = adId,
+                            adType = AdType.INTERSTITIAL
+                        )
+                    )
                 }
 
                 override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {

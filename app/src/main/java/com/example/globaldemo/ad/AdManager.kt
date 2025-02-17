@@ -6,8 +6,10 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.example.globaldemo.GlobalDemoApplication.Companion.container
+import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.ad.constant.AdPlatform
+import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.controller.BiddingAdController
 import com.example.globaldemo.domain.AppDataSourceUseCase
 import com.example.globaldemo.model.AdFailureInformation
@@ -15,6 +17,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
+import kotlin.math.pow
 
 /**
  * do ad business logic here
@@ -40,6 +43,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                         loadRewardVideoAdWithRetry(
                             context,
                             adFailureInformation.adId,
+                            adFailureInformation.adType,
                             controller,
                             nextRetryCount
                         )
@@ -52,47 +56,157 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     /**
      * 对单个广告源（max/bigo/kwai），加载失败5次后，判断缓存池中是否有广告源，
      *   - 若缓存池没有广告，第N次重新加载的请求间隔是2的(N-5)次方秒(s)，请求成功后，请求间隔重新累计；
-     *   - 若缓存池中存在任意一条广告源（max/bigo/kwai），则在用户下一次触发广告时，重新加载；
+     *   - 若缓存池中存在任意一条广告源（max/bigo/kwai），则在用户下一次触发广告时，从第 N 次加载
      */
     private fun loadRewardVideoAdWithRetry(
         context: Context,
         adId: String,
+        adType: AdType,
         controller: BiddingAdController,
         retryCount: Int
     ) {
         if (retryCount > MAX_LOAD_TIMES) {
             Log.e(TAG, "Failed to load reward ads after $MAX_LOAD_TIMES attempts.")
-            // TODO: - 若缓存池中存在任意一条广告源（max/bigo/kwai），则在用户下一次触发广告时，重新加载；
             if (checkIfAnyVideoAdReady()) {
+                adLoadingStatusMap[adId] = FailureAdLoadingStatus(
+                    adId = adId,
+                    adType = adType,
+                    retryCount = retryCount
+                )
                 return
             } else {
-                // TODO: - 若缓存池没有广告，第N次重新加载的请求间隔是2的(N-5)次方秒(s)，请求成功后，请求间隔重新累计；
+                val delayTime = getDelayTime(retryCount)
+                Handler(Looper.getMainLooper()).postDelayed({
+                    when (adType) {
+                        AdType.REWARD -> {
+                            controller.loadSpecificRewardVideoAd(
+                                context,
+                                adId,
+                                callback = object : RewardAdCallback {
+                                    override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
+                                        val nextRetryCount = retryCount + 1
+                                        Log.d(
+                                            TAG,
+                                            "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                                        )
+                                        loadRewardVideoAdWithRetry(context, adId, adType, controller, nextRetryCount)
+                                    }
+
+                                    override fun onLoaded() {
+                                        super.onLoaded()
+                                        adLoadingStatusMap.remove(adId)
+                                    }
+                                }
+                            )
+                        }
+
+                        AdType.INTERSTITIAL -> {
+                            controller.loadSpecificInterstitialAd(
+                                context,
+                                adId,
+                                callback = object : InterstitialAdCallback {
+                                    override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
+                                        val nextRetryCount = retryCount + 1
+                                        Log.d(
+                                            TAG,
+                                            "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                                        )
+                                        loadRewardVideoAdWithRetry(context, adId, adType, controller, nextRetryCount)
+                                    }
+
+                                    override fun onLoaded() {
+                                        super.onLoaded()
+                                        adLoadingStatusMap.remove(adId)
+                                    }
+                                }
+                            )
+                        }
+
+                        else -> return@postDelayed
+                    }
+                }, delayTime)
             }
         } else {
-            controller.loadSpecificRewardVideoAd(
-                context,
-                adId,
-                callback = object : RewardAdCallback {
-                    override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
-                        val nextRetryCount = retryCount + 1
-                        Log.d(
-                            TAG,
-                            "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
-                        )
-                        loadRewardVideoAdWithRetry(context, adId, controller, nextRetryCount)
-                    }
+            when (adType) {
+                AdType.REWARD -> {
+                    controller.loadSpecificRewardVideoAd(
+                        context,
+                        adId,
+                        callback = object : RewardAdCallback {
+                            override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
+                                val nextRetryCount = retryCount + 1
+                                Log.d(
+                                    TAG,
+                                    "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                                )
+                                loadRewardVideoAdWithRetry(context, adId, adType, controller, nextRetryCount)
+                            }
+                        }
+                    )
                 }
-            )
+
+                AdType.INTERSTITIAL -> {
+                    controller.loadSpecificInterstitialAd(
+                        context,
+                        adId,
+                        callback = object : InterstitialAdCallback {
+                            override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
+                                val nextRetryCount = retryCount + 1
+                                Log.d(
+                                    TAG,
+                                    "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                                )
+                                loadRewardVideoAdWithRetry(context, adId, adType, controller, nextRetryCount)
+                            }
+                        }
+                    )
+                }
+
+                else -> return
+            }
+
         }
     }
 
     private fun checkIfAnyVideoAdReady(): Boolean {
-        return true
+        adControllers.forEach { controller ->
+            Log.i(
+                TAG,
+                "checkIfAnyVideoAdReady() called with: videoAdsMap = ${controller.videoAdsMap}"
+            )
+            controller.videoAdsMap.values.forEach { adWrapper ->
+                val isAdNull = adWrapper.adInstance == null
+                val isAdLoaded = adWrapper.isLoaded
+                if (!isAdNull && isAdLoaded) return true
+            }
+        }
+        return false
     }
+
+    private fun getDelayTime(retryCount: Int): Long {
+        return 2.0.pow(retryCount - 5).toLong() * 1000
+    }
+
+    private val adLoadingStatusMap: MutableMap<String, FailureAdLoadingStatus> = mutableMapOf()
 
     private fun loadFailureVideoAd(context: Context) {
-
+        adLoadingStatusMap.values.forEach { failureAdLoadingStatus ->
+            loadRewardVideoAdWithRetry(
+                context,
+                failureAdLoadingStatus.adId,
+                failureAdLoadingStatus.adType,
+                findBestAdController()!!,
+                failureAdLoadingStatus.retryCount
+            )
+        }
     }
+
+    data class FailureAdLoadingStatus(
+        val adId: String,
+        val adType: AdType,
+        val retryCount: Int,
+    )
+
 
     fun displayRewardedAd(activity: Activity) {
         val highestRevenueAdController = findBestAdController()
@@ -115,6 +229,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
         if (bestAdController != null) {
             Log.d(TAG, "Displaying ad immediately.")
             bestAdController.displayHighestRevenueRewardVideoAd(activity)
+            loadFailureVideoAd(activity)
             onAdDisplayed()
         } else {
             Log.d(TAG, "No ad available immediately. Waiting for $AD_DISPLAY_DELAY_MS ms.")
@@ -132,6 +247,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
             if (bestAdController != null) {
                 Log.d(TAG, "Displaying ad after delay.")
                 bestAdController.displayHighestRevenueRewardVideoAd(activity)
+                loadFailureVideoAd(activity)
                 onAdDisplayed()
             } else {
                 Log.d(TAG, "No ad available after delay.")

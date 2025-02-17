@@ -7,7 +7,6 @@ import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.model.AdConfiguration
 import com.example.globaldemo.model.AdFailureInformation
-import com.kwai.network.a.it
 import com.kwai.network.sdk.KwaiAdSDK
 import com.kwai.network.sdk.constant.KwaiError
 import com.kwai.network.sdk.loader.business.reward.data.KwaiRewardAd
