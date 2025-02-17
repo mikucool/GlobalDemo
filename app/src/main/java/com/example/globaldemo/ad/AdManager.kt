@@ -2,7 +2,8 @@ package com.example.globaldemo.ad
 
 import android.app.Activity
 import android.content.Context
-import android.os.CountDownTimer
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.example.globaldemo.GlobalDemoApplication.Companion.container
 import com.example.globaldemo.ad.callback.RewardAdCallback
@@ -74,50 +75,54 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
         )
     }
 
-
-    fun displayRewardedAd(
-        activity: Activity,
-        onAdNotAvailableAtFirst: () -> Unit = {},
-        onAdNotAvailableAfter3Second: () -> Unit = {}
-    ) {
+    fun displayRewardedAd(activity: Activity) {
         val highestRevenueAdController =
             adControllers.maxByOrNull { it.getHighestRewardAdRevenue() }
         if (highestRevenueAdController != null && highestRevenueAdController.getHighestRewardAdRevenue() > 0) {
             highestRevenueAdController.displayHighestRevenueRewardVideoAd(activity)
-        } else {
-            onAdNotAvailableAtFirst.invoke()
-            displayHighestVideoAdAfter3Seconds(activity, onAdNotAvailableAfter3Second)
         }
     }
 
-    private fun displayHighestVideoAdAfter3Seconds(
+    /**
+     * Attempts to display a video ad, with a fallback mechanism to wait for a specified duration.
+     *
+     * @param activity The current activity.
+     * @param onAdDisplayed Callback invoked when an ad is successfully displayed.
+     * @param onAdNotAvailable Callback invoked when no ad is available after the delay.
+     */
+    fun tryToDisplayVideoAdWithDelay(
         activity: Activity,
-        onAdNotAvailable: () -> Unit
+        onAdDisplayed: () -> Unit = {},
+        onAdNotAvailable: () -> Unit = {},
     ) {
-        val highestRevenueAdController =
-            adControllers.maxByOrNull { it.getHighestRewardAdRevenue() }
-        object : CountDownTimer(3000, 1000) {
-            override fun onTick(p0: Long) {
-            }
+        val bestAdController = findBestAdController()
 
-            override fun onFinish() {
-                if (highestRevenueAdController != null) {
-                    highestRevenueAdController.displayHighestRevenueRewardVideoAd(activity)
-                } else {
-                    onAdNotAvailable.invoke()
-                }
-            }
+        if (bestAdController != null && bestAdController.getHighestRewardAdRevenue() > 0) {
+            Log.d(TAG, "Displaying ad immediately.")
+            bestAdController.displayHighestRevenueRewardVideoAd(activity)
+            onAdDisplayed()
+        } else {
+            Log.d(TAG, "No ad available immediately. Waiting for $AD_DISPLAY_DELAY_MS ms.")
+            waitForAdAvailability(activity, onAdDisplayed, onAdNotAvailable)
         }
     }
 
-    fun preLoadAllInterstitialAds(context: Context) {
-        adControllers.forEach { controller -> controller.loadInterstitialAds(context) }
-    }
-
-    fun displayInterstitialAd(activity: Activity) {
-        // just show Max interstitial ad
-        val maxController = adControllers.find { it.adConfiguration.adPlatform == AdPlatform.MAX }
-        maxController?.displayHighestRevenueInterstitialAd(activity)
+    private fun waitForAdAvailability(
+        activity: Activity,
+        onAdDisplayed: () -> Unit,
+        onAdNotAvailable: () -> Unit,
+    ) {
+        Handler(Looper.getMainLooper()).postDelayed({
+            val bestAdController = findBestAdController()
+            if (bestAdController != null && bestAdController.getHighestRewardAdRevenue() > 0) {
+                Log.d(TAG, "Displaying ad after delay.")
+                bestAdController.displayHighestRevenueRewardVideoAd(activity)
+                onAdDisplayed()
+            } else {
+                Log.d(TAG, "No ad available after delay.")
+                onAdNotAvailable()
+            }
+        }, AD_DISPLAY_DELAY_MS)
     }
 
     private suspend fun getAdControllers(): List<BiddingAdController> = coroutineScope {
@@ -130,8 +135,14 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
         return@coroutineScope AdControllerFactory.generateAdControllers(adConfigurations)
     }
 
+    private fun findBestAdController(): BiddingAdController? {
+        return adControllers.maxByOrNull { it.getHighestRewardAdRevenue() }
+    }
+
     companion object {
         private const val MAX_LOAD_TIMES = 5
+
+        private const val AD_DISPLAY_DELAY_MS = 3000L
         const val TAG = "AdManager"
     }
 }

@@ -22,10 +22,7 @@ class BiddingAdTestViewModel : ViewModel() {
     }
 
     fun displayRewardedAd(activity: Activity, adManager: AdManager) {
-        adManager.displayRewardedAd(
-            activity,
-            onTimeout = { updateRewardAdState(RewardAdState.LOAD_ERROR) }
-        )
+        adManager.displayRewardedAd(activity)
     }
 
 
