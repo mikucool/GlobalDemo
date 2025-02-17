@@ -16,11 +16,15 @@ import sg.bigo.ads.api.RewardVideoAdLoader
 import sg.bigo.ads.api.RewardVideoAdRequest
 
 class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : BiddingAdController {
-    override fun loadInterstitialAds(context: Context, callback: InterstitialAdCallback) {}
-
-    private val rewardAdsMap: MutableMap<String, RewardVideoAd?> by lazy {
+    override val videoAdsMap: MutableMap<String, AdWrapper> by lazy {
         (adConfiguration.adIdListMap[AdType.REWARD] ?: emptyList())
-            .associateWith { null }
+            .associateWith {
+                AdWrapper(
+                    adPlatform = adConfiguration.adPlatform,
+                    adType = AdType.REWARD,
+                    adId = it
+                )
+            }
             .toMutableMap()
     }
 
@@ -29,8 +33,10 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
             TAG,
             "loadRewardVideoAds() called with: callback = $eachRewardAdCallback, adConfiguration = $adConfiguration"
         )
-        rewardAdsMap.forEach { (adId, rewardAd) ->
-            if (rewardAd == null) loadSpecificRewardVideoAd(context, adId, eachRewardAdCallback)
+        videoAdsMap.forEach { (adId, adWrapper) ->
+            if (adWrapper.adType == AdType.REWARD && adWrapper.adInstance == null) {
+                loadSpecificRewardVideoAd(context, adId, eachRewardAdCallback)
+            }
         }
     }
 
@@ -39,8 +45,8 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
         adId: String,
         callback: RewardAdCallback
     ) {
-        val specificRewardAd = rewardAdsMap[adId]
-        if (specificRewardAd == null) {
+        val adWrapper = videoAdsMap[adId]
+        if (adWrapper != null && adWrapper.adInstance == null && adWrapper.adType == AdType.REWARD) {
             val request = RewardVideoAdRequest.Builder()
                 .withSlotId(adId)
                 .build()
@@ -58,13 +64,24 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
                     }
 
                     override fun onAdLoaded(p0: RewardVideoAd) {
-                        rewardAdsMap[adId] = p0
-                        Log.d(TAG, "onAdLoaded() called with: p0 = ${p0.bid?.price}")
-                        specificRewardAd?.setAdInteractionListener(object :
+                        videoAdsMap[adId] = AdWrapper(
+                            adPlatform = adConfiguration.adPlatform,
+                            adType = AdType.REWARD,
+                            adId = adId,
+                            adRevenue = p0.bid?.price ?: 0.0,
+                            adInstance = p0,
+                            isLoaded = true
+                        )
+                        Log.d(TAG, "onAdLoaded() called with: ad = ${videoAdsMap[adId]}")
+                        p0.setAdInteractionListener(object :
                             RewardAdInteractionListener {
                             override fun onAdError(p0: AdError) {
                                 Log.d(TAG, "onAdError() called with: p0 = $p0")
-                                rewardAdsMap[adId] = null
+                                videoAdsMap[adId] = AdWrapper(
+                                    adPlatform = adConfiguration.adPlatform,
+                                    adType = AdType.REWARD,
+                                    adId = adId
+                                )
                                 callback.onFailedToDisplay()
                             }
 
@@ -85,7 +102,11 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
 
                             override fun onAdClosed() {
                                 Log.d(TAG, "onAdClosed() called")
-                                rewardAdsMap[adId] = null
+                                videoAdsMap[adId] = AdWrapper(
+                                    adPlatform = adConfiguration.adPlatform,
+                                    adType = AdType.REWARD,
+                                    adId = adId
+                                )
                                 callback.onClosed()
                             }
 
@@ -106,16 +127,15 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
     }
 
     override fun displayHighestRevenueRewardVideoAd(activity: Activity) {
-        val rewardAd = rewardAdsMap.values.filterNotNull().maxByOrNull { it.bid?.price ?: 0.0 }
-        rewardAd?.show(activity)
+        val adWrapper = videoAdsMap.values.maxByOrNull { it.adRevenue }
+        Log.d(TAG, "displayHighestRevenueRewardVideoAd() called with: adWrapper = $adWrapper")
+        if (adWrapper?.adInstance != null) (adWrapper.adInstance as RewardVideoAd).show(activity)
     }
 
-    override fun getHighestRewardAdRevenue(): Double {
-        Log.i(
-            TAG,
-            "getHighestRewardAdRevenue() called with ad platform: ${adConfiguration.adPlatform}, revenueList: ${rewardAdsMap.values.map { it?.bid?.price }}"
-        )
-        return rewardAdsMap.values.filterNotNull().maxOfOrNull { it.bid?.price ?: 0.0 } ?: 0.0
+    override fun getBestAd(): AdWrapper? {
+        val bestBigoAd = videoAdsMap.values.maxByOrNull { it.adRevenue }
+        Log.i(TAG, "getHighestRewardAdRevenue() called with bestBigoAd: $bestBigoAd")
+        return bestBigoAd
     }
 
     companion object {

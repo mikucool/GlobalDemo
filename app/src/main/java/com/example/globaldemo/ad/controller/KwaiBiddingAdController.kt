@@ -3,11 +3,11 @@ package com.example.globaldemo.ad.controller
 import android.app.Activity
 import android.content.Context
 import android.util.Log
-import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.model.AdConfiguration
 import com.example.globaldemo.model.AdFailureInformation
+import com.kwai.network.a.it
 import com.kwai.network.sdk.KwaiAdSDK
 import com.kwai.network.sdk.constant.KwaiError
 import com.kwai.network.sdk.loader.business.reward.data.KwaiRewardAd
@@ -18,19 +18,23 @@ import com.kwai.network.sdk.loader.common.interf.AdLoadListener
 
 class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : BiddingAdController {
 
-    private val rewardAdsMap: MutableMap<String, KwaiRewardAd?> by lazy {
+    override val videoAdsMap: MutableMap<String, AdWrapper> by lazy {
         (adConfiguration.adIdListMap[AdType.REWARD] ?: emptyList())
-            .associateWith { null }
+            .associateWith {
+                AdWrapper(
+                    adPlatform = adConfiguration.adPlatform,
+                    adType = AdType.REWARD,
+                    adId = it
+                )
+            }
             .toMutableMap()
     }
 
-    override fun loadInterstitialAds(context: Context, callback: InterstitialAdCallback) {
-
-    }
-
     override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: RewardAdCallback) {
-        rewardAdsMap.forEach { (adId, rewardAd) ->
-            if (rewardAd == null) loadSpecificRewardVideoAd(context, adId, eachRewardAdCallback)
+        videoAdsMap.forEach { (adId, adWrapper) ->
+            if (adWrapper.adType == AdType.REWARD && adWrapper.adInstance == null) {
+                loadSpecificRewardVideoAd(context, adId, eachRewardAdCallback)
+            }
         }
     }
 
@@ -39,8 +43,8 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
         adId: String,
         callback: RewardAdCallback
     ) {
-        val specificRewardAd = rewardAdsMap[adId]
-        if (specificRewardAd == null) {
+        val adWrapper = videoAdsMap[adId]
+        if (adWrapper != null && adWrapper.adInstance == null && adWrapper.adType == AdType.REWARD) {
             val loader = KwaiAdSDK.getKwaiAdLoaderManager().buildRewardAdLoader(
                 KwaiRewardAdConfig.Builder(
                     object : AdLoadListener<KwaiRewardAd> {
@@ -60,8 +64,15 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
                         }
 
                         override fun onAdLoadSuccess(p0: String?, p1: KwaiRewardAd) {
-                            rewardAdsMap[adId] = p1
-                            Log.d(TAG, "onAdLoadSuccess() called with: p0 = $p0, p1 = $p1")
+                            videoAdsMap[adId] = AdWrapper(
+                                adPlatform = adConfiguration.adPlatform,
+                                adType = AdType.REWARD,
+                                adId = adId,
+                                adRevenue = p1.price.toDoubleOrNull() ?: 0.0,
+                                adInstance = p1,
+                                isLoaded = true
+                            )
+                            Log.d(TAG, "onAdLoadSuccess() called with: ad = ${videoAdsMap[adId]}")
                             callback.onLoaded()
                         }
                     }
@@ -72,7 +83,11 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
                     }
 
                     override fun onAdShowFailed(p0: KwaiError) {
-                        rewardAdsMap[adId] = null
+                        videoAdsMap[adId] = AdWrapper(
+                            adPlatform = adConfiguration.adPlatform,
+                            adType = AdType.REWARD,
+                            adId = adId
+                        )
                         Log.d(TAG, "onAdShowFailed() called with: p0 = $p0")
                         callback.onFailedToDisplay()
                     }
@@ -83,7 +98,11 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
                     }
 
                     override fun onAdClose() {
-                        rewardAdsMap[adId] = null
+                        videoAdsMap[adId] = AdWrapper(
+                            adPlatform = adConfiguration.adPlatform,
+                            adType = AdType.REWARD,
+                            adId = adId
+                        )
                         Log.d(TAG, "onAdClose() called")
                         callback.onClosed()
                     }
@@ -106,18 +125,16 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
     }
 
     override fun displayHighestRevenueRewardVideoAd(activity: Activity) {
-        val rewardAd =
-            rewardAdsMap.values.filterNotNull().maxByOrNull { it.price.toDoubleOrNull() ?: 0.0 }
-        rewardAd?.show(activity)
+        val adWrapper = videoAdsMap.values.maxByOrNull { it.adRevenue }
+        Log.d(TAG, "displayHighestRevenueRewardVideoAd() called with: adWrapper = $adWrapper")
+        if (adWrapper?.adInstance != null) (adWrapper.adInstance as KwaiRewardAd).show(activity)
+
     }
 
-    override fun getHighestRewardAdRevenue(): Double {
-        Log.i(
-            TAG,
-            "getHighestRewardAdRevenue() called with ad platform: ${adConfiguration.adPlatform}, revenueList: ${rewardAdsMap.values.map { it?.price }}"
-        )
-        return rewardAdsMap.values.filterNotNull().maxOfOrNull { it.price.toDoubleOrNull() ?: 0.0 }
-            ?: 0.0
+    override fun getBestAd(): AdWrapper? {
+        val bestKwaiAd = videoAdsMap.values.maxByOrNull { it.adRevenue }
+        Log.i(TAG, "getHighestRewardAdRevenue() called with bestKwaiAd: $bestKwaiAd")
+        return bestKwaiAd
     }
 
     companion object {

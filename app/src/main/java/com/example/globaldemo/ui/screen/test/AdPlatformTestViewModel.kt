@@ -66,30 +66,6 @@ class AdPlatformTestViewModel : ViewModel() {
 
     fun loadInterstitialAd(context: Context, biddingAdController: BiddingAdController) {
         updateInterstitialAdState(InterstitialAdState.LOADING)
-        biddingAdController.loadInterstitialAds(context, object : InterstitialAdCallback {
-            override fun onLoaded() {
-                super.onLoaded()
-                updateInterstitialAdState(InterstitialAdState.LOADED)
-            }
-            override fun onFailedToLoad() {
-                super.onFailedToLoad()
-                updateInterstitialAdState(InterstitialAdState.LOAD_ERROR)
-            }
-            override fun onDisplayed() {
-                super.onDisplayed()
-                updateInterstitialAdState(InterstitialAdState.DISPLAYED)
-            }
-
-            override fun onFailedToDisplay() {
-                super.onFailedToDisplay()
-                updateInterstitialAdState(InterstitialAdState.DISPLAY_ERROR)
-            }
-
-            override fun onClosed() {
-                super.onClosed()
-                updateInterstitialAdState(InterstitialAdState.CLOSED)
-            }
-        })
     }
 
     data class AdTestUiState(

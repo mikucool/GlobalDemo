@@ -24,8 +24,12 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
         adConfiguration.adIdListMap[AdType.INTERSTITIAL]?.firstOrNull() ?: ""
     }
     private var interstitialAd: InterstitialAd? = null
+    override val  videoAdsMap: MutableMap<String, AdWrapper> by lazy {
+        // empty mutable map
+        mutableMapOf()
+    }
 
-    override fun loadInterstitialAds(context: Context, callback: InterstitialAdCallback) {
+    fun loadInterstitialAds(context: Context, callback: InterstitialAdCallback = object : InterstitialAdCallback {}) {
         Log.d(TAG, "loadInterstitialAds() called with: context = $context, callback = $callback")
         val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(

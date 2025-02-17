@@ -34,11 +34,11 @@ class MainActivity : FragmentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     biddingAdControllers = controllers
                 )*/
-                /*RewardAdPlatformTestScreen(
+                RewardAdPlatformTestScreen(
                     modifier = Modifier.fillMaxSize(),
                     biddingAdControllers = controllers
-                )*/
-                BiddingAdTestScreen()
+                )
+//                BiddingAdTestScreen()
 //                NetworkTestScreen()
             }
         }

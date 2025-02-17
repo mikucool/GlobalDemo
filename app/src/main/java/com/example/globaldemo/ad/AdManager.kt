@@ -37,7 +37,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                             TAG,
                             "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
                         )
-                        loadRewardVideoAdsWithRetry(
+                        loadRewardVideoAdWithRetry(
                             context,
                             adFailureInformation.adId,
                             controller,
@@ -49,7 +49,12 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
         }
     }
 
-    private fun loadRewardVideoAdsWithRetry(
+    /**
+     * 对单个广告源（max/bigo/kwai），加载失败5次后，判断缓存池中是否有广告源，
+     *   - 若缓存池没有广告，第N次重新加载的请求间隔是2的(N-5)次方秒(s)，请求成功后，请求间隔重新累计；
+     *   - 若缓存池中存在任意一条广告源（max/bigo/kwai），则在用户下一次触发广告时，重新加载；
+     */
+    private fun loadRewardVideoAdWithRetry(
         context: Context,
         adId: String,
         controller: BiddingAdController,
@@ -57,30 +62,41 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     ) {
         if (retryCount > MAX_LOAD_TIMES) {
             Log.e(TAG, "Failed to load reward ads after $MAX_LOAD_TIMES attempts.")
-            return // Stop retrying
-        }
-        controller.loadSpecificRewardVideoAd(
-            context,
-            adId,
-            callback = object : RewardAdCallback {
-                override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
-                    val nextRetryCount = retryCount + 1
-                    Log.d(
-                        TAG,
-                        "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
-                    )
-                    loadRewardVideoAdsWithRetry(context, adId, controller, nextRetryCount)
-                }
+            // TODO: - 若缓存池中存在任意一条广告源（max/bigo/kwai），则在用户下一次触发广告时，重新加载；
+            if (checkIfAnyVideoAdReady()) {
+                return
+            } else {
+                // TODO: - 若缓存池没有广告，第N次重新加载的请求间隔是2的(N-5)次方秒(s)，请求成功后，请求间隔重新累计；
             }
-        )
+        } else {
+            controller.loadSpecificRewardVideoAd(
+                context,
+                adId,
+                callback = object : RewardAdCallback {
+                    override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
+                        val nextRetryCount = retryCount + 1
+                        Log.d(
+                            TAG,
+                            "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                        )
+                        loadRewardVideoAdWithRetry(context, adId, controller, nextRetryCount)
+                    }
+                }
+            )
+        }
+    }
+
+    private fun checkIfAnyVideoAdReady(): Boolean {
+        return true
+    }
+
+    private fun loadFailureVideoAd(context: Context) {
+
     }
 
     fun displayRewardedAd(activity: Activity) {
-        val highestRevenueAdController =
-            adControllers.maxByOrNull { it.getHighestRewardAdRevenue() }
-        if (highestRevenueAdController != null && highestRevenueAdController.getHighestRewardAdRevenue() > 0) {
-            highestRevenueAdController.displayHighestRevenueRewardVideoAd(activity)
-        }
+        val highestRevenueAdController = findBestAdController()
+        highestRevenueAdController?.displayHighestRevenueRewardVideoAd(activity)
     }
 
     /**
@@ -96,8 +112,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
         onAdNotAvailable: () -> Unit = {},
     ) {
         val bestAdController = findBestAdController()
-
-        if (bestAdController != null && bestAdController.getHighestRewardAdRevenue() > 0) {
+        if (bestAdController != null) {
             Log.d(TAG, "Displaying ad immediately.")
             bestAdController.displayHighestRevenueRewardVideoAd(activity)
             onAdDisplayed()
@@ -114,7 +129,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     ) {
         Handler(Looper.getMainLooper()).postDelayed({
             val bestAdController = findBestAdController()
-            if (bestAdController != null && bestAdController.getHighestRewardAdRevenue() > 0) {
+            if (bestAdController != null) {
                 Log.d(TAG, "Displaying ad after delay.")
                 bestAdController.displayHighestRevenueRewardVideoAd(activity)
                 onAdDisplayed()
@@ -136,12 +151,12 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     }
 
     private fun findBestAdController(): BiddingAdController? {
-        return adControllers.maxByOrNull { it.getHighestRewardAdRevenue() }
+        val adController = adControllers.maxByOrNull { it.getBestAd()?.adRevenue ?: 0.0 }
+        return if ((adController?.getBestAd()?.adRevenue ?: 0.0) > 0) adController else null
     }
 
     companion object {
         private const val MAX_LOAD_TIMES = 5
-
         private const val AD_DISPLAY_DELAY_MS = 3000L
         const val TAG = "AdManager"
     }
