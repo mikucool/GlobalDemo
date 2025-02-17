@@ -86,10 +86,15 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
         controller: BiddingAdController,
         retryCount: Int
     ) {
-        Log.w(TAG, "loadRewardVideoAdWithRetry() called with: retryCount = $retryCount, " +
-                "ad = ${controller.getAdWrapperById(adId)},")
+        Log.w(
+            TAG, "loadRewardVideoAdWithRetry() called with: retryCount = $retryCount, " +
+                    "ad = ${controller.getAdWrapperById(adId)},"
+        )
         if (retryCount > MAX_LOAD_TIMES) {
-            Log.e(TAG, "Failed to load reward ads after $MAX_LOAD_TIMES attempts, current retry count: $retryCount.")
+            Log.e(
+                TAG,
+                "Failed to load reward ads after $MAX_LOAD_TIMES attempts, current retry count: $retryCount."
+            )
             if (checkIfAnyVideoAdLoaded()) {
                 adLoadingStatusMap[adId] = FailureAdLoadingStatus(
                     adId = adId,
@@ -252,9 +257,16 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     )
 
 
-    fun displayRewardedAd(activity: Activity) {
-        val highestRevenueAdController = findBestAdController()
-        highestRevenueAdController?.displayHighestRevenueRewardVideoAd(activity)
+    fun displayVideoAd(activity: Activity) {
+        val bestController = findBestAdController()
+        val bestAdWrapper = bestController?.getBestAd()
+        if (bestAdWrapper != null) {
+            when (bestAdWrapper.adType) {
+                AdType.REWARD -> bestController.displayHighestRevenueRewardVideoAd(activity)
+                AdType.INTERSTITIAL -> bestController.displayHighestRevenueInterstitialAd(activity)
+                else -> return
+            }
+        }
     }
 
     /**

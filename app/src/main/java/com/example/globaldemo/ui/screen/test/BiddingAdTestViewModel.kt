@@ -22,7 +22,7 @@ class BiddingAdTestViewModel : ViewModel() {
     }
 
     fun displayRewardedAd(activity: Activity, adManager: AdManager) {
-        adManager.displayRewardedAd(activity)
+        adManager.displayVideoAd(activity)
     }
 
 
