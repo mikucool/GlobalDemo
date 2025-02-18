@@ -36,7 +36,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 
-class MainActivity : FragmentActivity() {
+class TestActivity : FragmentActivity() {
     private val controllers: List<BiddingAdController> by lazy {
         runBlocking { getAdControllers() }
     }
