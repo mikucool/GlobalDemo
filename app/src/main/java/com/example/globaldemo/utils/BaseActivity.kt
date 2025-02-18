@@ -15,8 +15,8 @@ abstract class BaseActivity<VB : ViewBinding>: AppCompatActivity() {
         hideSystemUi()
         setContentView(binding.root)
         initView()
-        initData()
         createObserver()
+        initData()
     }
 
     protected open fun initView() {
