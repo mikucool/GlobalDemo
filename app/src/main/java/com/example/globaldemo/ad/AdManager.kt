@@ -8,6 +8,7 @@ import android.util.Log
 import com.example.globaldemo.GlobalDemoApplication.Companion.container
 import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.callback.RewardAdCallback
+import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.controller.AdWrapper
@@ -256,55 +257,38 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
         val retryCount: Int,
     )
 
-
     fun displayVideoAd(activity: Activity) {
         val bestController = findBestAdController()
-        val bestAdWrapper = bestController?.getBestAd()
-        if (bestAdWrapper != null) {
-            when (bestAdWrapper.adType) {
-                AdType.REWARD -> bestController.displayHighestRevenueRewardVideoAd(activity)
-                AdType.INTERSTITIAL -> bestController.displayHighestRevenueInterstitialAd(activity)
-                else -> return
-            }
-        }
+        bestController?.displayBestVideoAd(activity)
     }
 
-    /**
-     * Attempts to display a video ad, with a fallback mechanism to wait for a specified duration.
-     *
-     * @param activity The current activity.
-     * @param onAdDisplayed Callback invoked when an ad is successfully displayed.
-     * @param onAdNotAvailable Callback invoked when no ad is available after the delay.
-     */
     fun tryToDisplayVideoAdWithDelay(
         activity: Activity,
-        onAdDisplayed: () -> Unit = {},
         onAdNotAvailable: () -> Unit = {},
+        videoAdShowCallback: VideoAdShowCallback
     ) {
         val bestAdController = findBestAdController()
         if (bestAdController != null) {
             Log.d(TAG, "Displaying ad immediately.")
-            bestAdController.displayHighestRevenueRewardVideoAd(activity)
+            bestAdController.displayBestVideoAd(activity, videoAdShowCallback)
             loadFailureVideoAd(activity)
-            onAdDisplayed()
         } else {
             Log.d(TAG, "No ad available immediately. Waiting for $AD_DISPLAY_DELAY_MS ms.")
-            waitForAdAvailability(activity, onAdDisplayed, onAdNotAvailable)
+            waitForAdAvailability(activity, onAdNotAvailable, videoAdShowCallback)
         }
     }
 
     private fun waitForAdAvailability(
         activity: Activity,
-        onAdDisplayed: () -> Unit,
         onAdNotAvailable: () -> Unit,
+        videoAdShowCallback: VideoAdShowCallback
     ) {
         Handler(Looper.getMainLooper()).postDelayed({
             val bestAdController = findBestAdController()
             if (bestAdController != null) {
                 Log.d(TAG, "Displaying ad after delay.")
-                bestAdController.displayHighestRevenueRewardVideoAd(activity)
+                bestAdController.displayBestVideoAd(activity, videoAdShowCallback)
                 loadFailureVideoAd(activity)
-                onAdDisplayed()
             } else {
                 Log.d(TAG, "No ad available after delay.")
                 onAdNotAvailable()
@@ -323,8 +307,8 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
     }
 
     private fun findBestAdController(): BiddingAdController? {
-        val adController = adControllers.maxByOrNull { it.getBestAd()?.adRevenue ?: 0.0 }
-        return if ((adController?.getBestAd()?.adRevenue ?: 0.0) > 0) adController else null
+        val adController = adControllers.maxByOrNull { it.getBestVideoAd()?.adRevenue ?: 0.0 }
+        return if ((adController?.getBestVideoAd()?.adRevenue ?: 0.0) > 0) adController else null
     }
 
     private fun BiddingAdController.getAdWrapperById(adId: String): AdWrapper? {

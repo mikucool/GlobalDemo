@@ -10,6 +10,7 @@ import com.applovin.mediation.MaxReward
 import com.applovin.mediation.MaxRewardedAdListener
 import com.applovin.mediation.ads.MaxInterstitialAd
 import com.applovin.mediation.ads.MaxRewardedAd
+import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.callback.RewardAdCallback
@@ -38,6 +39,11 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
             .toMutableMap()
         // Merge the two maps
         (rewardAdMap + interstitialAdMap).toMutableMap()
+    }
+
+    override val videoAdShowCallbackMap: MutableMap<AdWrapper, VideoAdShowCallback> by lazy {
+        // empty mutable map
+        mutableMapOf()
     }
 
     override fun loadAllInterstitialAds(
@@ -199,6 +205,27 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
         }
     }
 
+    override fun displayBestVideoAd(activity: Activity, videoAdShowCallback: VideoAdShowCallback) {
+        val adWrapper = videoAdsMap.values.maxByOrNull { it.adRevenue }
+        Log.i(TAG, "displayBestVideoAd() called with: adWrapper = $adWrapper")
+        when (adWrapper?.adType) {
+            AdType.REWARD -> {
+                if (adWrapper.adInstance != null) {
+                    (adWrapper.adInstance as MaxRewardedAd).showAd(activity)
+                }
+            }
+
+            AdType.INTERSTITIAL -> {
+                if (adWrapper.adInstance != null) {
+                    (adWrapper.adInstance as MaxInterstitialAd).showAd(activity)
+                }
+            }
+
+            else -> return
+        }
+
+    }
+
     override fun displayHighestRevenueInterstitialAd(activity: Activity) {
         val adWrapper = videoAdsMap.values.filter { it.adType == AdType.INTERSTITIAL }.toList()
             .maxByOrNull { it.adRevenue }
@@ -218,7 +245,7 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
         }
     }
 
-    override fun getBestAd(): AdWrapper? {
+    override fun getBestVideoAd(): AdWrapper? {
         val bestMaxAd = videoAdsMap.values.maxByOrNull { it.adRevenue }
         Log.i(
             KwaiBiddingAdController.TAG,

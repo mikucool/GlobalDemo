@@ -30,15 +30,15 @@ class MainActivity : FragmentActivity() {
         enableEdgeToEdge()
         setContent {
             GlobalDemoTheme {
-                InterstitialAdPlatformTestScreen(
+                /*InterstitialAdPlatformTestScreen(
                     modifier = Modifier.fillMaxSize(),
                     biddingAdControllers = controllers
-                )
+                )*/
                 /*RewardAdPlatformTestScreen(
                     modifier = Modifier.fillMaxSize(),
                     biddingAdControllers = controllers
                 )*/
-//                BiddingAdTestScreen()
+                BiddingAdTestScreen()
 //                NetworkTestScreen()
             }
         }

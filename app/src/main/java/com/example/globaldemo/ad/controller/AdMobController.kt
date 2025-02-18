@@ -3,6 +3,7 @@ package com.example.globaldemo.ad.controller
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.ad.constant.AdType
@@ -26,6 +27,10 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
     }
     private var interstitialAd: InterstitialAd? = null
     override val  videoAdsMap: MutableMap<String, AdWrapper> by lazy {
+        // empty mutable map
+        mutableMapOf()
+    }
+    override val videoAdShowCallbackMap: MutableMap<AdWrapper, VideoAdShowCallback> by lazy {
         // empty mutable map
         mutableMapOf()
     }

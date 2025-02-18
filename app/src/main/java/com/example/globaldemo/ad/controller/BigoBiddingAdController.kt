@@ -3,12 +3,14 @@ package com.example.globaldemo.ad.controller
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.callback.RewardAdCallback
 import com.example.globaldemo.model.AdConfiguration
 import com.example.globaldemo.model.AdFailureInformation
 import sg.bigo.ads.api.AdError
 import sg.bigo.ads.api.AdLoadListener
+import sg.bigo.ads.api.InterstitialAd
 import sg.bigo.ads.api.RewardAdInteractionListener
 import sg.bigo.ads.api.RewardVideoAd
 import sg.bigo.ads.api.RewardVideoAdLoader
@@ -25,6 +27,11 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
                 )
             }
             .toMutableMap()
+    }
+
+    override val videoAdShowCallbackMap: MutableMap<AdWrapper, VideoAdShowCallback> by lazy {
+        // empty mutable map
+        mutableMapOf()
     }
 
     override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: RewardAdCallback) {
@@ -119,16 +126,34 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
         }
     }
 
-    override fun displayHighestRevenueInterstitialAd(activity: Activity) {
+    override fun displayBestVideoAd(activity: Activity, videoAdShowCallback: VideoAdShowCallback) {
+        val adWrapper = videoAdsMap.values.maxByOrNull { it.adRevenue }
+        Log.d(TAG, "displayBestVideoAd() called with: adWrapper = $adWrapper")
+        when (adWrapper?.adType) {
+            AdType.REWARD -> {
+                if (adWrapper.adInstance != null) {
+                    (adWrapper.adInstance as RewardVideoAd).show(activity)
+                }
+            }
+
+            AdType.INTERSTITIAL -> {
+                if (adWrapper.adInstance != null) {
+                    (adWrapper.adInstance as InterstitialAd).show(activity)
+                }
+            }
+
+            else -> return
+        }
     }
 
     override fun displayHighestRevenueRewardVideoAd(activity: Activity) {
-        val adWrapper = videoAdsMap.values.maxByOrNull { it.adRevenue }
+        val adWrapper =
+            videoAdsMap.values.filter { it.adType == AdType.REWARD }.maxByOrNull { it.adRevenue }
         Log.d(TAG, "displayHighestRevenueRewardVideoAd() called with: adWrapper = $adWrapper")
         if (adWrapper?.adInstance != null) (adWrapper.adInstance as RewardVideoAd).show(activity)
     }
 
-    override fun getBestAd(): AdWrapper? {
+    override fun getBestVideoAd(): AdWrapper? {
         val bestBigoAd = videoAdsMap.values.maxByOrNull { it.adRevenue }
         Log.i(TAG, "getHighestRewardAdRevenue() called with bestBigoAd: $bestBigoAd")
         return bestBigoAd

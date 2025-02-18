@@ -8,11 +8,15 @@ object AdInfoLogUtil {
         // log the ad info for each controller
         Log.i(tag, "===========================Begin=============================")
         controllers.forEach { controller ->
-            Log.d(tag, "Controller: ${controller.adConfiguration.adPlatform}")
+            Log.d(tag, "  Controller: ${controller.adConfiguration.adPlatform}")
             controller.videoAdsMap.forEach { (adId, adWrapper) ->
-                Log.d(tag, "  Ad ID: $adId, Ad Wrapper: $adWrapper")
+                if (adWrapper.adInstance == null) {
+                    Log.e(tag, "  Ad ID: $adId, Ad Wrapper: $adWrapper")
+                } else {
+                    Log.d(tag, "  Ad ID: $adId, Ad Wrapper: $adWrapper")
+                }
             }
-            Log.d(tag, "  Best Ad: ${controller.getBestAd()}")
+            Log.d(tag, "  Best Ad: ${controller.getBestVideoAd()}")
             val loadedAdCount = controller.videoAdsMap.count { it.value.adInstance != null }
             Log.d(tag, "  Loaded Ad Count: $loadedAdCount")
             Log.d(tag, "----------------------------------------------------------")
