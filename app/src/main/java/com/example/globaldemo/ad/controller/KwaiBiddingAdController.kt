@@ -6,6 +6,8 @@ import android.util.Log
 import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.callback.VideoAdLoadCallback
+import com.example.globaldemo.ad.constant.AdDisplayState
+import com.example.globaldemo.ad.controller.BigoBiddingAdController.Companion
 import com.example.globaldemo.model.AdConfiguration
 import com.example.globaldemo.model.AdFailureInformation
 import com.kwai.network.sdk.KwaiAdSDK
@@ -85,6 +87,7 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
                 ).withKwaiRewardAdListener(object : IKwaiRewardAdListener {
                     override fun onAdShow() {
                         Log.d(TAG, "onAdShow() called")
+                        executeVideoAdShowCallback(adId, AdDisplayState.DISPLAYED)
                     }
 
                     override fun onAdShowFailed(p0: KwaiError) {
@@ -94,10 +97,12 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
                             adId = adId
                         )
                         Log.e(TAG, "onAdShowFailed() called with: p0 = $p0")
+                        executeVideoAdShowCallback(adId, AdDisplayState.DISPLAY_ERROR)
                     }
 
                     override fun onAdClick() {
                         Log.d(TAG, "onAdClick() called")
+                        executeVideoAdShowCallback(adId, AdDisplayState.CLICKED)
                     }
 
                     override fun onAdClose() {
@@ -107,6 +112,7 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
                             adId = adId
                         )
                         Log.d(TAG, "onAdClose() called")
+                        executeVideoAdShowCallback(adId, AdDisplayState.CLOSED)
                     }
 
                     override fun onAdPlayComplete() {
@@ -115,6 +121,7 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
 
                     override fun onRewardEarned() {
                         Log.d(TAG, "onRewardEarned() called")
+                        executeVideoAdShowCallback(adId, AdDisplayState.REWARDED)
                     }
                 }).build()
             )
@@ -158,8 +165,40 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
         return bestKwaiAd
     }
 
+
+    private fun executeVideoAdShowCallback(adId: String, adDisplayState: AdDisplayState) {
+        Log.d(
+            TAG,
+            "executeVideoAdShowCallback() called with: ad = ${videoAdsMap[adId]}, adDisplayState = $adDisplayState"
+        )
+        when (adDisplayState) {
+            AdDisplayState.DISPLAYED -> {
+                videoAdShowCallbackMap[adId]?.onDisplayed()
+            }
+
+            AdDisplayState.DISPLAY_ERROR -> {
+                videoAdShowCallbackMap[adId]?.onFailedToDisplay()
+                videoAdShowCallbackMap.remove(adId)
+            }
+
+            AdDisplayState.CLOSED -> {
+                videoAdShowCallbackMap[adId]?.onClosed()
+                videoAdShowCallbackMap.remove(adId)
+            }
+
+            AdDisplayState.REWARDED -> {
+                videoAdShowCallbackMap[adId]?.onRewarded()
+
+            }
+
+            AdDisplayState.CLICKED -> {
+                videoAdShowCallbackMap[adId]?.onClicked()
+            }
+        }
+    }
+
     companion object {
-        const val TAG = "KwaiBiddingAdController"
+        private const val TAG = "KwaiBiddingAdController"
     }
 
 }

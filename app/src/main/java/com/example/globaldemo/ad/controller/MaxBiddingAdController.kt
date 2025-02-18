@@ -13,6 +13,8 @@ import com.applovin.mediation.ads.MaxRewardedAd
 import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.callback.VideoAdLoadCallback
+import com.example.globaldemo.ad.constant.AdDisplayState
+import com.example.globaldemo.ad.controller.KwaiBiddingAdController.Companion
 import com.example.globaldemo.model.AdConfiguration
 import com.example.globaldemo.model.AdFailureInformation
 
@@ -57,7 +59,10 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
         }
     }
 
-    override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: VideoAdLoadCallback) {
+    override fun loadAllRewardVideoAds(
+        context: Context,
+        eachRewardAdCallback: VideoAdLoadCallback
+    ) {
         Log.i(TAG, "loadAllRewardVideoAds() called with: configuration = $adConfiguration")
         videoAdsMap.forEach { (adId, adWrapper) ->
             if (adWrapper.adType == AdType.REWARD && adWrapper.adInstance == null) {
@@ -88,23 +93,6 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
                     callback.onLoaded()
                 }
 
-                override fun onAdDisplayed(p0: MaxAd) {
-                    Log.d(TAG, "onAdDisplayed() called with: p0 = $p0")
-                }
-
-                override fun onAdHidden(p0: MaxAd) {
-                    Log.d(TAG, "onAdHidden() called with: p0 = $p0")
-                    videoAdsMap[adId] = AdWrapper(
-                        adPlatform = adConfiguration.adPlatform,
-                        adType = AdType.REWARD,
-                        adId = adId
-                    )
-                }
-
-                override fun onAdClicked(p0: MaxAd) {
-                    Log.d(TAG, "onAdClicked() called with: p0 = $p0")
-                }
-
                 override fun onAdLoadFailed(p0: String, p1: MaxError) {
                     Log.e(TAG, "onAdLoadFailed() called with: p0 = $p0, p1 = $p1")
                     callback.onFailedToLoad(
@@ -116,6 +104,26 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
                     )
                 }
 
+                override fun onAdDisplayed(p0: MaxAd) {
+                    Log.d(TAG, "onAdDisplayed() called with: p0 = $p0")
+                    executeVideoAdShowCallback(adId, AdDisplayState.DISPLAYED)
+                }
+
+                override fun onAdHidden(p0: MaxAd) {
+                    Log.d(TAG, "onAdHidden() called with: p0 = $p0")
+                    videoAdsMap[adId] = AdWrapper(
+                        adPlatform = adConfiguration.adPlatform,
+                        adType = AdType.REWARD,
+                        adId = adId
+                    )
+                    executeVideoAdShowCallback(adId, AdDisplayState.CLOSED)
+                }
+
+                override fun onAdClicked(p0: MaxAd) {
+                    Log.d(TAG, "onAdClicked() called with: p0 = $p0")
+                    executeVideoAdShowCallback(adId, AdDisplayState.CLICKED)
+                }
+
                 override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
                     Log.e(TAG, "onAdDisplayFailed() called with: p0 = $p0, p1 = $p1")
                     videoAdsMap[adId] = AdWrapper(
@@ -123,10 +131,12 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
                         adType = AdType.REWARD,
                         adId = adId
                     )
+                    executeVideoAdShowCallback(adId, AdDisplayState.DISPLAY_ERROR)
                 }
 
                 override fun onUserRewarded(p0: MaxAd, p1: MaxReward) {
                     Log.d(TAG, "onUserRewarded() called with: p0 = $p0, p1 = $p1")
+                    executeVideoAdShowCallback(adId, AdDisplayState.REWARDED)
                 }
             })
             maxRewardAd.loadAd()
@@ -154,23 +164,6 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
                     callback.onLoaded()
                 }
 
-                override fun onAdDisplayed(p0: MaxAd) {
-                    Log.d(TAG, "onAdDisplayed() called with: p0 = $p0")
-                }
-
-                override fun onAdHidden(p0: MaxAd) {
-                    Log.d(TAG, "onAdHidden() called with: p0 = $p0")
-                    videoAdsMap[adId] = AdWrapper(
-                        adPlatform = adConfiguration.adPlatform,
-                        adType = AdType.INTERSTITIAL,
-                        adId = adId
-                    )
-                }
-
-                override fun onAdClicked(p0: MaxAd) {
-                    Log.d(TAG, "onAdClicked() called with: p0 = $p0")
-                }
-
                 override fun onAdLoadFailed(p0: String, p1: MaxError) {
                     Log.e(TAG, "onAdLoadFailed() called with: p0 = $p0, p1 = $p1")
                     callback.onFailedToLoad(
@@ -182,6 +175,25 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
                     )
                 }
 
+                override fun onAdDisplayed(p0: MaxAd) {
+                    Log.d(TAG, "onAdDisplayed() called with: p0 = $p0")
+                    executeVideoAdShowCallback(adId, AdDisplayState.DISPLAYED)
+                }
+
+                override fun onAdHidden(p0: MaxAd) {
+                    Log.d(TAG, "onAdHidden() called with: p0 = $p0")
+                    videoAdsMap[adId] = AdWrapper(
+                        adPlatform = adConfiguration.adPlatform,
+                        adType = AdType.INTERSTITIAL,
+                        adId = adId
+                    )
+                    executeVideoAdShowCallback(adId, AdDisplayState.CLOSED)
+                }
+
+                override fun onAdClicked(p0: MaxAd) {
+                    Log.d(TAG, "onAdClicked() called with: p0 = $p0")
+                }
+
                 override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
                     Log.e(TAG, "onAdDisplayFailed() called with: p0 = $p0, p1 = $p1")
                     videoAdsMap[adId] = AdWrapper(
@@ -189,6 +201,7 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
                         adType = AdType.INTERSTITIAL,
                         adId = adId
                     )
+                    executeVideoAdShowCallback(adId, AdDisplayState.DISPLAY_ERROR)
                 }
             })
             ad.loadAd()
@@ -237,12 +250,41 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
 
     override fun getBestVideoAd(): AdWrapper? {
         val bestMaxAd = videoAdsMap.values.maxByOrNull { it.adRevenue }
-        Log.i(
-            KwaiBiddingAdController.TAG,
-            "getHighestRewardAdRevenue() called with bestKwaiAd: $bestMaxAd"
-        )
+        Log.i(TAG, "getHighestRewardAdRevenue() called with bestKwaiAd: $bestMaxAd")
         return bestMaxAd
     }
+
+    private fun executeVideoAdShowCallback(adId: String, adDisplayState: AdDisplayState) {
+        Log.d(
+            TAG,
+            "executeVideoAdShowCallback() called with: ad = ${videoAdsMap[adId]}, adDisplayState = $adDisplayState"
+        )
+        when (adDisplayState) {
+            AdDisplayState.DISPLAYED -> {
+                videoAdShowCallbackMap[adId]?.onDisplayed()
+            }
+
+            AdDisplayState.DISPLAY_ERROR -> {
+                videoAdShowCallbackMap[adId]?.onFailedToDisplay()
+                videoAdShowCallbackMap.remove(adId)
+            }
+
+            AdDisplayState.CLOSED -> {
+                videoAdShowCallbackMap[adId]?.onClosed()
+                videoAdShowCallbackMap.remove(adId)
+            }
+
+            AdDisplayState.REWARDED -> {
+                videoAdShowCallbackMap[adId]?.onRewarded()
+
+            }
+
+            AdDisplayState.CLICKED -> {
+                videoAdShowCallbackMap[adId]?.onClicked()
+            }
+        }
+    }
+
 
     companion object {
         const val TAG = "MaxBiddingAdController"

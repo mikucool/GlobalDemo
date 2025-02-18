@@ -20,3 +20,7 @@ enum class InterstitialAdState {
     DISPLAY_ERROR,
     CLOSED
 }
+
+enum class AdDisplayState {
+    DISPLAYED, DISPLAY_ERROR, CLOSED, REWARDED, CLICKED
+}
