@@ -33,45 +33,51 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
 
     fun loadAllVideoAds(context: Context) {
         adControllers.forEach { controller ->
-            controller.loadAllRewardVideoAds(
-                context = context,
-                eachRewardAdCallback = object : VideoAdLoadCallback {
-                    override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
-                        val nextRetryCount = 2
-                        Log.e(
-                            TAG,
-                            "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
-                        )
-                        loadRewardVideoAdWithRetry(
-                            context,
-                            adFailureInformation.adId,
-                            adFailureInformation.adType,
-                            controller,
-                            nextRetryCount
-                        )
-                    }
-                }
-            )
-            controller.loadAllInterstitialAds(
-                context = context,
-                eachInterstitialAdCallback = object : VideoAdLoadCallback {
-                    override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
-                        val nextRetryCount = 2
-                        Log.d(
-                            TAG,
-                            "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
-                        )
-                        loadRewardVideoAdWithRetry(
-                            context,
-                            adFailureInformation.adId,
-                            adFailureInformation.adType,
-                            controller,
-                            nextRetryCount
-                        )
-                    }
-                }
-            )
+            loadVideoAdsByAdPlatform(context, controller.adConfiguration.adPlatform)
         }
+    }
+
+    fun loadVideoAdsByAdPlatform(context: Context, adPlatform: AdPlatform) {
+        Log.d(TAG, "loadVideoAdsByAdPlatform() called with: adPlatform = $adPlatform")
+        val controller = adControllers.find { it.adConfiguration.adPlatform == adPlatform }
+        controller?.loadAllRewardVideoAds(
+            context = context,
+            eachRewardAdCallback = object : VideoAdLoadCallback {
+                override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
+                    val nextRetryCount = 2
+                    Log.e(
+                        TAG,
+                        "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                    )
+                    loadRewardVideoAdWithRetry(
+                        context,
+                        adFailureInformation.adId,
+                        adFailureInformation.adType,
+                        controller,
+                        nextRetryCount
+                    )
+                }
+            }
+        )
+        controller?.loadAllInterstitialAds(
+            context = context,
+            eachInterstitialAdCallback = object : VideoAdLoadCallback {
+                override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
+                    val nextRetryCount = 2
+                    Log.d(
+                        TAG,
+                        "onFailedToLoad() called with: adInformation = $adFailureInformation, nextRetryCount = $nextRetryCount"
+                    )
+                    loadRewardVideoAdWithRetry(
+                        context,
+                        adFailureInformation.adId,
+                        adFailureInformation.adType,
+                        controller,
+                        nextRetryCount
+                    )
+                }
+            }
+        )
     }
 
     /**

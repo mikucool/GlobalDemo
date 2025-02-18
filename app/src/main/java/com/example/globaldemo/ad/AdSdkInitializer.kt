@@ -5,6 +5,8 @@ import android.util.Log
 import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
+import com.example.globaldemo.GlobalDemoApplication.Companion.container
+import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.configuration.ApplicationConfiguration
 import com.google.android.gms.ads.MobileAds
 import com.kwai.network.sdk.KwaiAdSDK
@@ -27,6 +29,7 @@ object AdSdkInitializer {
                 .setInitCallback(object : KwaiInitCallback {
                     override fun onSuccess() {
                         Log.d(TAG, "initKwaiAd onSuccess() called")
+                        container.adManager.loadVideoAdsByAdPlatform(context, AdPlatform.KWAI)
                     }
 
                     override fun onFail(p0: Int, p1: String?) {
@@ -44,6 +47,7 @@ object AdSdkInitializer {
             .build()
         BigoAdSdk.initialize(context, config) {
             Log.d(TAG, "initBigoAd() called with initialized")
+            container.adManager.loadVideoAdsByAdPlatform(context, AdPlatform.BIGO)
         }
     }
 
@@ -58,6 +62,7 @@ object AdSdkInitializer {
             .build()
         AppLovinSdk.getInstance(context).initialize(initConfig) { sdkConfig ->
             Log.d(TAG, "initMaxAd() called with: sdkConfig = $sdkConfig")
+            container.adManager.loadVideoAdsByAdPlatform(context, AdPlatform.MAX)
             updateMaxAdUserSettings(context)
         }
     }
@@ -66,6 +71,7 @@ object AdSdkInitializer {
         CoroutineScope(Dispatchers.IO).launch {
             MobileAds.initialize(context) { status ->
                 Log.d(TAG, "initAdMob() called with: init status = ${status.adapterStatusMap}")
+                container.adManager.loadVideoAdsByAdPlatform(context, AdPlatform.ADMOB)
             }
         }
     }
