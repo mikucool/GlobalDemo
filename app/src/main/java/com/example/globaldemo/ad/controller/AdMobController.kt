@@ -4,8 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import com.example.globaldemo.ad.callback.VideoAdShowCallback
-import com.example.globaldemo.ad.callback.InterstitialAdCallback
-import com.example.globaldemo.ad.callback.RewardAdCallback
+import com.example.globaldemo.ad.callback.VideoAdLoadCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.model.AdConfiguration
 import com.example.globaldemo.model.AdFailureInformation
@@ -30,12 +29,12 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
         // empty mutable map
         mutableMapOf()
     }
-    override val videoAdShowCallbackMap: MutableMap<AdWrapper, VideoAdShowCallback> by lazy {
+    override val videoAdShowCallbackMap: MutableMap<String, VideoAdShowCallback> by lazy {
         // empty mutable map
         mutableMapOf()
     }
 
-    fun loadInterstitialAds(context: Context, callback: InterstitialAdCallback = object : InterstitialAdCallback {}) {
+    fun loadInterstitialAds(context: Context, callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}) {
         Log.d(TAG, "loadInterstitialAds() called with: context = $context, callback = $callback")
         val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(
@@ -110,7 +109,7 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
         }
     }
 
-    override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: RewardAdCallback) {
+    override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: VideoAdLoadCallback) {
         throw UnsupportedOperationException("AdMob does not support this operation")
     }
 

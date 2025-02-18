@@ -11,9 +11,8 @@ import com.applovin.mediation.MaxRewardedAdListener
 import com.applovin.mediation.ads.MaxInterstitialAd
 import com.applovin.mediation.ads.MaxRewardedAd
 import com.example.globaldemo.ad.callback.VideoAdShowCallback
-import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.constant.AdType
-import com.example.globaldemo.ad.callback.RewardAdCallback
+import com.example.globaldemo.ad.callback.VideoAdLoadCallback
 import com.example.globaldemo.model.AdConfiguration
 import com.example.globaldemo.model.AdFailureInformation
 
@@ -41,14 +40,14 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
         (rewardAdMap + interstitialAdMap).toMutableMap()
     }
 
-    override val videoAdShowCallbackMap: MutableMap<AdWrapper, VideoAdShowCallback> by lazy {
+    override val videoAdShowCallbackMap: MutableMap<String, VideoAdShowCallback> by lazy {
         // empty mutable map
         mutableMapOf()
     }
 
     override fun loadAllInterstitialAds(
         context: Context,
-        eachInterstitialAdCallback: InterstitialAdCallback
+        eachInterstitialAdCallback: VideoAdLoadCallback
     ) {
         Log.i(TAG, "loadAllInterstitialAds() called with: configuration = $adConfiguration")
         videoAdsMap.forEach { (adId, adWrapper) ->
@@ -58,7 +57,7 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
         }
     }
 
-    override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: RewardAdCallback) {
+    override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: VideoAdLoadCallback) {
         Log.i(TAG, "loadAllRewardVideoAds() called with: configuration = $adConfiguration")
         videoAdsMap.forEach { (adId, adWrapper) ->
             if (adWrapper.adType == AdType.REWARD && adWrapper.adInstance == null) {
@@ -70,7 +69,7 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
     override fun loadSpecificRewardVideoAd(
         context: Context,
         adId: String,
-        callback: RewardAdCallback
+        callback: VideoAdLoadCallback
     ) {
         val adWrapper = videoAdsMap[adId]
         if (adWrapper != null && adWrapper.adInstance == null && adWrapper.adType == AdType.REWARD) {
@@ -91,7 +90,6 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
 
                 override fun onAdDisplayed(p0: MaxAd) {
                     Log.d(TAG, "onAdDisplayed() called with: p0 = $p0")
-                    callback.onDisplayed()
                 }
 
                 override fun onAdHidden(p0: MaxAd) {
@@ -101,12 +99,10 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
                         adType = AdType.REWARD,
                         adId = adId
                     )
-                    callback.onClosed()
                 }
 
                 override fun onAdClicked(p0: MaxAd) {
                     Log.d(TAG, "onAdClicked() called with: p0 = $p0")
-                    callback.onClicked()
                 }
 
                 override fun onAdLoadFailed(p0: String, p1: MaxError) {
@@ -127,12 +123,10 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
                         adType = AdType.REWARD,
                         adId = adId
                     )
-                    callback.onFailedToDisplay()
                 }
 
                 override fun onUserRewarded(p0: MaxAd, p1: MaxReward) {
                     Log.d(TAG, "onUserRewarded() called with: p0 = $p0, p1 = $p1")
-                    callback.onRewarded()
                 }
             })
             maxRewardAd.loadAd()
@@ -142,7 +136,7 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
     override fun loadSpecificInterstitialAd(
         context: Context,
         adId: String,
-        callback: InterstitialAdCallback
+        callback: VideoAdLoadCallback
     ) {
         val adWrapper = videoAdsMap[adId]
         if (adWrapper != null && adWrapper.adInstance == null && adWrapper.adType == AdType.INTERSTITIAL) {
@@ -162,7 +156,6 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
 
                 override fun onAdDisplayed(p0: MaxAd) {
                     Log.d(TAG, "onAdDisplayed() called with: p0 = $p0")
-                    callback.onDisplayed()
                 }
 
                 override fun onAdHidden(p0: MaxAd) {
@@ -172,12 +165,10 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
                         adType = AdType.INTERSTITIAL,
                         adId = adId
                     )
-                    callback.onClosed()
                 }
 
                 override fun onAdClicked(p0: MaxAd) {
                     Log.d(TAG, "onAdClicked() called with: p0 = $p0")
-                    callback.onClicked()
                 }
 
                 override fun onAdLoadFailed(p0: String, p1: MaxError) {
@@ -198,7 +189,6 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
                         adType = AdType.INTERSTITIAL,
                         adId = adId
                     )
-                    callback.onFailedToDisplay()
                 }
             })
             ad.loadAd()

@@ -6,8 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.example.globaldemo.GlobalDemoApplication.Companion.container
-import com.example.globaldemo.ad.callback.InterstitialAdCallback
-import com.example.globaldemo.ad.callback.RewardAdCallback
+import com.example.globaldemo.ad.callback.VideoAdLoadCallback
 import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.constant.AdPlatform
 import com.example.globaldemo.ad.constant.AdType
@@ -36,7 +35,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
         adControllers.forEach { controller ->
             controller.loadAllRewardVideoAds(
                 context = context,
-                eachRewardAdCallback = object : RewardAdCallback {
+                eachRewardAdCallback = object : VideoAdLoadCallback {
                     override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
                         val nextRetryCount = 2
                         Log.e(
@@ -55,7 +54,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
             )
             controller.loadAllInterstitialAds(
                 context = context,
-                eachInterstitialAdCallback = object : InterstitialAdCallback {
+                eachInterstitialAdCallback = object : VideoAdLoadCallback {
                     override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
                         val nextRetryCount = 2
                         Log.d(
@@ -112,7 +111,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                             controller.loadSpecificRewardVideoAd(
                                 context,
                                 adId,
-                                callback = object : RewardAdCallback {
+                                callback = object : VideoAdLoadCallback {
                                     override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
                                         val nextRetryCount = retryCount + 1
                                         Log.e(
@@ -140,7 +139,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                             controller.loadSpecificInterstitialAd(
                                 context,
                                 adId,
-                                callback = object : InterstitialAdCallback {
+                                callback = object : VideoAdLoadCallback {
                                     override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
                                         val nextRetryCount = retryCount + 1
                                         Log.e(
@@ -174,7 +173,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                     controller.loadSpecificRewardVideoAd(
                         context,
                         adId,
-                        callback = object : RewardAdCallback {
+                        callback = object : VideoAdLoadCallback {
                             override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
                                 val nextRetryCount = retryCount + 1
                                 Log.e(
@@ -197,7 +196,7 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
                     controller.loadSpecificInterstitialAd(
                         context,
                         adId,
-                        callback = object : InterstitialAdCallback {
+                        callback = object : VideoAdLoadCallback {
                             override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
                                 val nextRetryCount = retryCount + 1
                                 Log.e(

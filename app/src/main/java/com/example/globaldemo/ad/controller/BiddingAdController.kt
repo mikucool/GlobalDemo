@@ -3,8 +3,7 @@ package com.example.globaldemo.ad.controller
 import android.app.Activity
 import android.content.Context
 import com.example.globaldemo.ad.callback.VideoAdShowCallback
-import com.example.globaldemo.ad.callback.InterstitialAdCallback
-import com.example.globaldemo.ad.callback.RewardAdCallback
+import com.example.globaldemo.ad.callback.VideoAdLoadCallback
 import com.example.globaldemo.model.AdConfiguration
 
 interface BiddingAdController {
@@ -18,7 +17,10 @@ interface BiddingAdController {
      */
     val videoAdsMap: MutableMap<String, AdWrapper>
 
-    val videoAdShowCallbackMap: MutableMap<AdWrapper, VideoAdShowCallback>
+    /**
+     * first: adId, second: VideoAdShowCallback
+     */
+    val videoAdShowCallbackMap: MutableMap<String, VideoAdShowCallback>
 
     /**
      * load all reward video ads
@@ -27,7 +29,7 @@ interface BiddingAdController {
      */
     fun loadAllRewardVideoAds(
         context: Context,
-        eachRewardAdCallback: RewardAdCallback = object : RewardAdCallback {}
+        eachRewardAdCallback: VideoAdLoadCallback = object : VideoAdLoadCallback {}
     ) = Unit
 
     /**
@@ -37,7 +39,7 @@ interface BiddingAdController {
      */
     fun loadAllInterstitialAds(
         context: Context,
-        eachInterstitialAdCallback: InterstitialAdCallback = object : InterstitialAdCallback {}
+        eachInterstitialAdCallback: VideoAdLoadCallback = object : VideoAdLoadCallback {}
     ) = Unit
 
     /**
@@ -46,7 +48,11 @@ interface BiddingAdController {
      * @param adId ad id
      * @param callback callback
      */
-    fun loadSpecificRewardVideoAd(context: Context, adId: String, callback: RewardAdCallback) = Unit
+    fun loadSpecificRewardVideoAd(
+        context: Context,
+        adId: String,
+        callback: VideoAdLoadCallback
+    ) = Unit
 
     /**
      * load specific interstitial ad
@@ -57,7 +63,7 @@ interface BiddingAdController {
     fun loadSpecificInterstitialAd(
         context: Context,
         adId: String,
-        callback: InterstitialAdCallback
+        callback: VideoAdLoadCallback
     ) = Unit
 
     /**

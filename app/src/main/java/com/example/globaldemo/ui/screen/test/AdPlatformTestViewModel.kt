@@ -2,10 +2,9 @@ package com.example.globaldemo.ui.screen.test
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.example.globaldemo.ad.callback.InterstitialAdCallback
 import com.example.globaldemo.ad.controller.BiddingAdController
 import com.example.globaldemo.ad.constant.AdPlatform
-import com.example.globaldemo.ad.callback.RewardAdCallback
+import com.example.globaldemo.ad.callback.VideoAdLoadCallback
 import com.example.globaldemo.ad.constant.InterstitialAdState
 import com.example.globaldemo.ad.constant.RewardAdState
 import com.example.globaldemo.model.AdFailureInformation
@@ -30,38 +29,14 @@ class AdPlatformTestViewModel : ViewModel() {
 
     fun loadRewardAd(context: Context, biddingAdController: BiddingAdController) {
         updateRewardAdState(RewardAdState.LOADING)
-        biddingAdController.loadAllRewardVideoAds(context, object : RewardAdCallback {
+        biddingAdController.loadAllRewardVideoAds(context, object : VideoAdLoadCallback {
             override fun onLoaded() {
-                super.onLoaded()
                 updateRewardAdState(RewardAdState.LOADED)
             }
-
             override fun onFailedToLoad(adFailureInformation: AdFailureInformation) {
-                super.onFailedToLoad(adFailureInformation)
                 updateRewardAdState(RewardAdState.LOAD_ERROR)
             }
-
-            override fun onDisplayed() {
-                super.onDisplayed()
-                updateRewardAdState(RewardAdState.DISPLAYED)
-            }
-
-            override fun onFailedToDisplay() {
-                super.onFailedToDisplay()
-                updateRewardAdState(RewardAdState.DISPLAY_ERROR)
-            }
-
-            override fun onRewarded() {
-                super.onRewarded()
-                updateRewardAdState(RewardAdState.REWARDED)
-            }
-
-            override fun onClosed() {
-                super.onClosed()
-                updateRewardAdState(RewardAdState.CLOSED)
-            }
         })
-
     }
 
     fun loadInterstitialAd(context: Context, biddingAdController: BiddingAdController) {

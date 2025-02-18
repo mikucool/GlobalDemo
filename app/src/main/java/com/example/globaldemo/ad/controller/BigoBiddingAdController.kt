@@ -5,7 +5,7 @@ import android.content.Context
 import android.util.Log
 import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.constant.AdType
-import com.example.globaldemo.ad.callback.RewardAdCallback
+import com.example.globaldemo.ad.callback.VideoAdLoadCallback
 import com.example.globaldemo.model.AdConfiguration
 import com.example.globaldemo.model.AdFailureInformation
 import sg.bigo.ads.api.AdError
@@ -29,12 +29,12 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
             .toMutableMap()
     }
 
-    override val videoAdShowCallbackMap: MutableMap<AdWrapper, VideoAdShowCallback> by lazy {
+    override val videoAdShowCallbackMap: MutableMap<String, VideoAdShowCallback> by lazy {
         // empty mutable map
         mutableMapOf()
     }
 
-    override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: RewardAdCallback) {
+    override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: VideoAdLoadCallback) {
         Log.i(TAG, "loadRewardVideoAds() called with: adConfiguration = $adConfiguration")
         videoAdsMap.forEach { (adId, adWrapper) ->
             if (adWrapper.adType == AdType.REWARD && adWrapper.adInstance == null) {
@@ -46,7 +46,7 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
     override fun loadSpecificRewardVideoAd(
         context: Context,
         adId: String,
-        callback: RewardAdCallback
+        callback: VideoAdLoadCallback
     ) {
         val adWrapper = videoAdsMap[adId]
         if (adWrapper != null && adWrapper.adInstance == null && adWrapper.adType == AdType.REWARD) {
@@ -85,22 +85,18 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
                                     adType = AdType.REWARD,
                                     adId = adId
                                 )
-                                callback.onFailedToDisplay()
                             }
 
                             override fun onAdImpression() {
                                 Log.d(TAG, "onAdImpression() called")
-                                callback.onDisplayed()
                             }
 
                             override fun onAdClicked() {
                                 Log.d(TAG, "onAdClicked() called")
-                                callback.onClicked()
                             }
 
                             override fun onAdOpened() {
                                 Log.d(TAG, "onAdOpened() called")
-                                callback.onOpened()
                             }
 
                             override fun onAdClosed() {
@@ -110,12 +106,10 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
                                     adType = AdType.REWARD,
                                     adId = adId
                                 )
-                                callback.onClosed()
                             }
 
                             override fun onAdRewarded() {
                                 Log.d(TAG, "onAdRewarded() called")
-                                callback.onRewarded()
                             }
                         })
                         callback.onLoaded()
@@ -132,12 +126,14 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
         when (adWrapper?.adType) {
             AdType.REWARD -> {
                 if (adWrapper.adInstance != null) {
+                    videoAdShowCallbackMap[adWrapper.adId] = videoAdShowCallback
                     (adWrapper.adInstance as RewardVideoAd).show(activity)
                 }
             }
 
             AdType.INTERSTITIAL -> {
                 if (adWrapper.adInstance != null) {
+                    videoAdShowCallbackMap[adWrapper.adId] = videoAdShowCallback
                     (adWrapper.adInstance as InterstitialAd).show(activity)
                 }
             }
