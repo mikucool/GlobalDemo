@@ -7,7 +7,6 @@ import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.callback.VideoAdLoadCallback
 import com.example.globaldemo.ad.constant.AdDisplayState
-import com.example.globaldemo.ad.controller.BigoBiddingAdController.Companion
 import com.example.globaldemo.model.AdConfiguration
 import com.example.globaldemo.model.AdFailureInformation
 import com.kwai.network.sdk.KwaiAdSDK
@@ -149,8 +148,7 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
         }
     }
 
-    override fun displayHighestRevenueRewardVideoAd(activity: Activity) {
-        super.displayHighestRevenueRewardVideoAd(activity)
+    override fun displayHighestRevenueRewardVideoAd(activity: Activity, videoAdShowCallback: VideoAdShowCallback) {
         val adWrapper =
             videoAdsMap.values.filter { it.adType == AdType.REWARD }.maxByOrNull { it.adRevenue }
         Log.d(TAG, "displayHighestRevenueRewardVideoAd() called with: adWrapper = $adWrapper")
@@ -161,7 +159,7 @@ class KwaiBiddingAdController(override val adConfiguration: AdConfiguration) : B
 
     override fun getBestVideoAd(): AdWrapper? {
         val bestKwaiAd = videoAdsMap.values.maxByOrNull { it.adRevenue }
-        Log.i(TAG, "getHighestRewardAdRevenue() called with bestKwaiAd: $bestKwaiAd")
+        Log.i(TAG, "getBestVideoAd() called with bestKwaiAd: $bestKwaiAd")
         return bestKwaiAd
     }
 

@@ -256,15 +256,10 @@ class AdManager(private val appDataSourceUseCase: AppDataSourceUseCase = contain
         val retryCount: Int,
     )
 
-    fun displayVideoAd(activity: Activity) {
-        val bestController = findBestAdController()
-        bestController?.displayBestVideoAd(activity)
-    }
-
     fun tryToDisplayVideoAdWithDelay(
         activity: Activity,
         onAdNotAvailable: () -> Unit = {},
-        videoAdShowCallback: VideoAdShowCallback
+        videoAdShowCallback: VideoAdShowCallback = object : VideoAdShowCallback {}
     ) {
         val bestAdController = findBestAdController()
         if (bestAdController != null) {

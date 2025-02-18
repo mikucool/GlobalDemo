@@ -113,11 +113,11 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
         throw UnsupportedOperationException("AdMob does not support this operation")
     }
 
-    override fun displayHighestRevenueInterstitialAd(activity: Activity) {
+    override fun displayHighestRevenueInterstitialAd(activity: Activity, videoAdShowCallback: VideoAdShowCallback) {
         showInterstitialAd(activity)
     }
 
-    override fun displayHighestRevenueRewardVideoAd(activity: Activity) {
+    override fun displayHighestRevenueRewardVideoAd(activity: Activity, videoAdShowCallback: VideoAdShowCallback) {
         throw UnsupportedOperationException("AdMob does not support this operation")
     }
 

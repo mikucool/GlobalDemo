@@ -76,8 +76,8 @@ interface BiddingAdController {
         videoAdShowCallback: VideoAdShowCallback = object : VideoAdShowCallback {}
     ) = Unit
 
-    fun displayHighestRevenueInterstitialAd(activity: Activity) = Unit
-    fun displayHighestRevenueRewardVideoAd(activity: Activity) = Unit
+    fun displayHighestRevenueInterstitialAd(activity: Activity, videoAdShowCallback: VideoAdShowCallback = object : VideoAdShowCallback {}) = Unit
+    fun displayHighestRevenueRewardVideoAd(activity: Activity, videoAdShowCallback: VideoAdShowCallback = object : VideoAdShowCallback {}) = Unit
 
 
     fun getBestVideoAd(): AdWrapper? = null

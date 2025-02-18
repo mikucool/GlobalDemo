@@ -14,7 +14,6 @@ import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.ad.callback.VideoAdLoadCallback
 import com.example.globaldemo.ad.constant.AdDisplayState
-import com.example.globaldemo.ad.controller.KwaiBiddingAdController.Companion
 import com.example.globaldemo.model.AdConfiguration
 import com.example.globaldemo.model.AdFailureInformation
 
@@ -229,7 +228,7 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
 
     }
 
-    override fun displayHighestRevenueInterstitialAd(activity: Activity) {
+    override fun displayHighestRevenueInterstitialAd(activity: Activity, videoAdShowCallback: VideoAdShowCallback) {
         val adWrapper = videoAdsMap.values.filter { it.adType == AdType.INTERSTITIAL }.toList()
             .maxByOrNull { it.adRevenue }
         Log.d(TAG, "displayHighestRevenueInterstitialAd() called with: adWrapper = $adWrapper")
@@ -239,7 +238,7 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
     }
 
 
-    override fun displayHighestRevenueRewardVideoAd(activity: Activity) {
+    override fun displayHighestRevenueRewardVideoAd(activity: Activity, videoAdShowCallback: VideoAdShowCallback) {
         val adWrapper = videoAdsMap.values.filter { it.adType == AdType.REWARD }.toList()
             .maxByOrNull { it.adRevenue }
         Log.d(TAG, "displayHighestRevenueRewardVideoAd() called with: adWrapper = $adWrapper")
@@ -250,7 +249,7 @@ class MaxBiddingAdController(override val adConfiguration: AdConfiguration) : Bi
 
     override fun getBestVideoAd(): AdWrapper? {
         val bestMaxAd = videoAdsMap.values.maxByOrNull { it.adRevenue }
-        Log.i(TAG, "getHighestRewardAdRevenue() called with bestKwaiAd: $bestMaxAd")
+        Log.i(TAG, "getBestVideoAd() called with bestKwaiAd: $bestMaxAd")
         return bestMaxAd
     }
 

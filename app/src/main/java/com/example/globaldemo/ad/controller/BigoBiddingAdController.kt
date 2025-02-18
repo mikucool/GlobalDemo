@@ -151,7 +151,7 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
         }
     }
 
-    override fun displayHighestRevenueRewardVideoAd(activity: Activity) {
+    override fun displayHighestRevenueRewardVideoAd(activity: Activity, videoAdShowCallback: VideoAdShowCallback) {
         val adWrapper =
             videoAdsMap.values.filter { it.adType == AdType.REWARD }.maxByOrNull { it.adRevenue }
         Log.d(TAG, "displayHighestRevenueRewardVideoAd() called with: adWrapper = $adWrapper")
@@ -159,8 +159,12 @@ class BigoBiddingAdController(override val adConfiguration: AdConfiguration) : B
     }
 
     override fun getBestVideoAd(): AdWrapper? {
-        val bestBigoAd = videoAdsMap.values.maxByOrNull { it.adRevenue }
-        Log.i(TAG, "getHighestRewardAdRevenue() called with bestBigoAd: $bestBigoAd")
+        val bestBigoAd = videoAdsMap.values.maxByOrNull {
+            val revenue = it.adRevenue
+            Log.i(TAG, "getBestVideoAd() called with revenue: $revenue")
+            revenue
+        }
+        Log.i(TAG, "getBestVideoAd() called with bestBigoAd: $bestBigoAd")
         return bestBigoAd
     }
 
