@@ -1,4 +1,4 @@
-package com.example.globaldemo.ui
+package com.example.globaldemo
 
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
