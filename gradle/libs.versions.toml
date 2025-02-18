@@ -17,6 +17,7 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 kotlinxCoroutinesCore = "1.8.1"
 kotlinxSerializationJson = "1.5.1"
+leakcanaryAndroidVersion = "3.0-alpha-1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
@@ -67,6 +68,7 @@ play-services-ads = { module = "com.google.android.gms:play-services-ads", versi
 play-services-ads-identifier = { module = "com.google.android.gms:play-services-ads-identifier", version.ref = "playServicesAdsIdentifier" }
 play-services-appset = { module = "com.google.android.gms:play-services-appset", version.ref = "playServicesAppset" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+squareup-leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroidVersion" }
 thinkinganalyticssdk = { module = "cn.thinkingdata.android:ThinkingAnalyticsSDK", version.ref = "thinkinganalyticssdk" }
 
 [plugins]

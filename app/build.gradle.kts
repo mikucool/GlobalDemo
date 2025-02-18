@@ -121,6 +121,8 @@ dependencies {
     // admob
     implementation(libs.play.services.ads)
     implementation(libs.play.services.ads.identifier)
+
+    debugImplementation(libs.squareup.leakcanary.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
