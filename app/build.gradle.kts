@@ -85,7 +85,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("androidx.databinding:viewbinding:8.7.3") // Or the latest version
+    implementation(libs.androidx.constraintlayout)
 
 
     // compose view-model

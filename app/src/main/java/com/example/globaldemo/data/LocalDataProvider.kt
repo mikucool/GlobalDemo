@@ -68,7 +68,10 @@ object LocalDataProvider {
                     ApplicationConfiguration.AD_MOB_INTERSTITIAL_ID_1
                 ),
                 AdType.BANNER to listOf(),
-                AdType.NATIVE to listOf()
+                AdType.NATIVE to listOf(),
+                AdType.SPLASH to listOf(
+                    ApplicationConfiguration.AD_MOB_SPLASH_ID_1
+                )
             )
         )
     )

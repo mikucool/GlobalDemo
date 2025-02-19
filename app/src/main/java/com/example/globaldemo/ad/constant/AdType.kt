@@ -1,5 +1,5 @@
 package com.example.globaldemo.ad.constant
 
 enum class AdType {
-    REWARD, INTERSTITIAL, BANNER, NATIVE, UNKNOWN
+    REWARD, INTERSTITIAL, BANNER, NATIVE, SPLASH, UNKNOWN
 }

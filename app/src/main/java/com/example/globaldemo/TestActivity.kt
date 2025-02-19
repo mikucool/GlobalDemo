@@ -123,7 +123,7 @@ class TestActivity : FragmentActivity() {
             async { appDataSourceUseCase.fetchAdConfigurationByAdPlatform(AdPlatform.ADMOB) }
         )
         val adConfigurations = deferredConfigs.awaitAll()
-        return@coroutineScope AdControllerFactory.generateAdControllers(adConfigurations)
+        return@coroutineScope AdControllerFactory.createBiddingControllers(adConfigurations)
     }
 
     enum class TestType {

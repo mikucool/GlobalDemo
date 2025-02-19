@@ -3,8 +3,8 @@ package com.example.globaldemo.ad.controller
 import android.app.Activity
 import android.content.Context
 import android.util.Log
-import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.callback.VideoAdLoadCallback
+import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.constant.AdType
 import com.example.globaldemo.model.AdConfiguration
 import com.example.globaldemo.model.AdFailureInformation
@@ -13,28 +13,30 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.OnPaidEventListener
+import com.google.android.gms.ads.appopen.AppOpenAd
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import java.util.Date
 
 /**
  * 虽然实现 BiddingAdController，但是业务不要求 AdMob 广告的客户端比价，所以这里没有实现
  * AdMob业务需求：插屏、开屏、banner、native
  */
-class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAdController {
+class AdMobController(val adConfiguration: AdConfiguration) {
     private val interstitialAdId: String by lazy {
         adConfiguration.adIdListMap[AdType.INTERSTITIAL]?.firstOrNull() ?: ""
     }
-    private var interstitialAd: InterstitialAd? = null
-    override val  videoAdsMap: MutableMap<String, AdWrapper> by lazy {
-        // empty mutable map
-        mutableMapOf()
-    }
-    override val videoAdShowCallbackMap: MutableMap<String, VideoAdShowCallback> by lazy {
-        // empty mutable map
-        mutableMapOf()
+    private val splashAdId: String by lazy {
+        adConfiguration.adIdListMap[AdType.SPLASH]?.firstOrNull() ?: ""
     }
 
-    fun loadInterstitialAds(context: Context, callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}) {
+    private var interstitialAd: InterstitialAd? = null
+    private var splashAd: AppOpenAd? = null
+
+    fun loadInterstitialAd(
+        context: Context,
+        callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}
+    ) {
         Log.d(TAG, "loadInterstitialAds() called with: context = $context, callback = $callback")
         val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(
@@ -68,18 +70,25 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
         )
     }
 
-    private fun showInterstitialAd(activity: Activity) {
+    fun displayInterstitialAd(activity: Activity, callback: VideoAdShowCallback) {
+        if (!isInterstitialAdAvailable()) {
+            callback.onFailedToDisplay()
+            loadInterstitialAd(activity)
+            return
+        }
         interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdClicked() {
                 // Called when a click is recorded for an ad.
                 Log.d(TAG, "Ad was clicked.")
+                callback.onClicked()
             }
 
             override fun onAdDismissedFullScreenContent() {
                 // Called when ad is dismissed.
                 Log.d(TAG, "Ad dismissed fullscreen content.")
                 interstitialAd = null
-                loadInterstitialAds(activity)
+                callback.onClosed()
+                loadInterstitialAd(activity)
             }
 
             override fun onAdFailedToShowFullScreenContent(p0: AdError) {
@@ -87,7 +96,8 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
                 // Called when ad fails to show.
                 Log.d(TAG, "Ad failed to show fullscreen content.")
                 interstitialAd = null
-                loadInterstitialAds(activity)
+                callback.onFailedToDisplay()
+                loadInterstitialAd(activity)
             }
 
             override fun onAdImpression() {
@@ -98,6 +108,7 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
             override fun onAdShowedFullScreenContent() {
                 // Called when ad is shown.
                 Log.d(TAG, "Ad showed fullscreen content.")
+                callback.onDisplayed()
             }
         }
 
@@ -105,23 +116,105 @@ class AdMobController(override val adConfiguration: AdConfiguration) : BiddingAd
             interstitialAd?.show(activity)
         } else {
             Log.d(TAG, "The interstitial ad wasn't ready yet.")
-            loadInterstitialAds(activity)
+            loadInterstitialAd(activity)
         }
     }
 
-    override fun loadAllRewardVideoAds(context: Context, eachRewardAdCallback: VideoAdLoadCallback) {
-        throw UnsupportedOperationException("AdMob does not support this operation")
+    private var loadTime = 0L
+    fun loadSplashAd(
+        context: Context,
+        callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}
+    ) {
+        Log.d(TAG, "loadSplashAd() called with: context = $context, callback = $callback")
+        val adRequest = AdRequest.Builder().build()
+        AppOpenAd.load(
+            context,
+            splashAdId,
+            adRequest,
+            object : AppOpenAd.AppOpenAdLoadCallback() {
+                override fun onAdLoaded(p0: AppOpenAd) {
+                    super.onAdLoaded(p0)
+                    Log.d(TAG, "onAdLoaded() called with: p0 = $p0")
+                    splashAd = p0
+                    loadTime = Date().time
+                    callback.onLoaded()
+                }
+
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+                    super.onAdFailedToLoad(p0)
+                    Log.d(TAG, "onAdFailedToLoad() called with: p0 = $p0")
+                    callback.onFailedToLoad(
+                        AdFailureInformation(
+                            platform = adConfiguration.adPlatform,
+                            adId = splashAdId,
+                            adType = AdType.SPLASH
+                        )
+                    )
+                }
+            }
+        )
     }
 
-    override fun displayHighestRevenueInterstitialAd(activity: Activity, videoAdShowCallback: VideoAdShowCallback) {
-        showInterstitialAd(activity)
+    fun displaySplashActivity(
+        activity: Activity,
+        callback: VideoAdShowCallback = object : VideoAdShowCallback {}
+    ) {
+        Log.d(TAG, "displaySplashActivity() called with: activity = $activity, callback = $callback")
+        if (!isSplashAdAvailable()) {
+            callback.onFailedToDisplay()
+            loadSplashAd(activity)
+            return
+        }
+        splashAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdShowedFullScreenContent() {
+                super.onAdShowedFullScreenContent()
+                Log.d(TAG, "onAdShowedFullScreenContent() called")
+                callback.onDisplayed()
+            }
+
+            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                super.onAdFailedToShowFullScreenContent(p0)
+                Log.d(TAG, "onAdFailedToShowFullScreenContent() called with: p0 = $p0")
+                splashAd = null
+                callback.onFailedToDisplay()
+                loadSplashAd(activity)
+            }
+
+            override fun onAdClicked() {
+                super.onAdClicked()
+                Log.d(TAG, "onAdClicked() called")
+                callback.onClicked()
+            }
+
+            override fun onAdDismissedFullScreenContent() {
+                super.onAdDismissedFullScreenContent()
+                Log.d(TAG, "onAdDismissedFullScreenContent() called")
+                splashAd = null
+                callback.onClosed()
+                loadSplashAd(activity)
+            }
+        }
+        splashAd?.show(activity)
     }
 
-    override fun displayHighestRevenueRewardVideoAd(activity: Activity, videoAdShowCallback: VideoAdShowCallback) {
-        throw UnsupportedOperationException("AdMob does not support this operation")
+    private fun isSplashAdAvailable(): Boolean {
+        return splashAd != null && wasLoadTimeLessThanNHoursAgo(SPLASH_EXPIRED_HOUR_TIME)
+    }
+
+    private fun isInterstitialAdAvailable(): Boolean {
+        return interstitialAd != null && wasLoadTimeLessThanNHoursAgo(INTERSTITIAL_EXPIRED_HOUR_TIME)
+    }
+
+    /** Utility method to check if ad was loaded more than n hours ago. */
+    private fun wasLoadTimeLessThanNHoursAgo(numHours: Long): Boolean {
+        val dateDifference: Long = Date().time - loadTime
+        val numMilliSecondsPerHour: Long = 3600000
+        return dateDifference < numMilliSecondsPerHour * numHours
     }
 
     companion object {
         private const val TAG = "AdMobController"
+        private const val SPLASH_EXPIRED_HOUR_TIME = 4L
+        private const val INTERSTITIAL_EXPIRED_HOUR_TIME = 1L
     }
 }

@@ -18,7 +18,7 @@ class BiddingAdTestViewModel : ViewModel() {
     fun loadVideoAd(context: Context, adManager: AdManager) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         viewModelScope.launch {
-            adManager.loadAllVideoAds(context)
+            adManager.loadAllBiddingVideoAds(context)
             // mock delay
             delay(2000)
             _uiState.value = _uiState.value.copy(isLoading = false)
@@ -26,7 +26,7 @@ class BiddingAdTestViewModel : ViewModel() {
     }
 
     fun displayRewardedAd(activity: Activity, adManager: AdManager) {
-        adManager.tryToDisplayVideoAdWithDelay(
+        adManager.displayBiddingVideoAd(
             activity = activity,
             onAdNotAvailable = {
                 _uiState.value = _uiState.value.copy(displayMessage = "No ad available.")
