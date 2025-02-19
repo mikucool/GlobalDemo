@@ -3,6 +3,7 @@ package com.example.globaldemo.ad.controller
 import android.app.Activity
 import android.content.Context
 import android.util.Log
+import com.example.globaldemo.GlobalDemoApplication
 import com.example.globaldemo.ad.callback.VideoAdLoadCallback
 import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.ad.constant.AdType
@@ -33,10 +34,8 @@ class AdMobController(val adConfiguration: AdConfiguration) {
     private var interstitialAd: InterstitialAd? = null
     private var splashAd: AppOpenAd? = null
 
-    fun loadInterstitialAd(
-        context: Context,
-        callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}
-    ) {
+    fun loadInterstitialAd(callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}) {
+        val context: Context = GlobalDemoApplication.instance
         Log.d(TAG, "loadInterstitialAds() called with: context = $context, callback = $callback")
         val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(
@@ -73,7 +72,6 @@ class AdMobController(val adConfiguration: AdConfiguration) {
     fun displayInterstitialAd(activity: Activity, callback: VideoAdShowCallback) {
         if (!isInterstitialAdAvailable()) {
             callback.onFailedToDisplay()
-            loadInterstitialAd(activity)
             return
         }
         interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
@@ -88,7 +86,6 @@ class AdMobController(val adConfiguration: AdConfiguration) {
                 Log.d(TAG, "Ad dismissed fullscreen content.")
                 interstitialAd = null
                 callback.onClosed()
-                loadInterstitialAd(activity)
             }
 
             override fun onAdFailedToShowFullScreenContent(p0: AdError) {
@@ -97,7 +94,6 @@ class AdMobController(val adConfiguration: AdConfiguration) {
                 Log.d(TAG, "Ad failed to show fullscreen content.")
                 interstitialAd = null
                 callback.onFailedToDisplay()
-                loadInterstitialAd(activity)
             }
 
             override fun onAdImpression() {
@@ -112,20 +108,14 @@ class AdMobController(val adConfiguration: AdConfiguration) {
             }
         }
 
-        if (interstitialAd != null) {
-            interstitialAd?.show(activity)
-        } else {
-            Log.d(TAG, "The interstitial ad wasn't ready yet.")
-            loadInterstitialAd(activity)
-        }
+        interstitialAd?.show(activity)
+
     }
 
     private var loadTime = 0L
-    fun loadSplashAd(
-        context: Context,
-        callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}
-    ) {
-        Log.d(TAG, "loadSplashAd() called with: context = $context, callback = $callback")
+    fun loadSplashAd(callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}) {
+        val context: Context = GlobalDemoApplication.instance
+        Log.d(TAG, "loadSplashAd() called with: callback = $callback")
         val adRequest = AdRequest.Builder().build()
         AppOpenAd.load(
             context,
@@ -159,10 +149,13 @@ class AdMobController(val adConfiguration: AdConfiguration) {
         activity: Activity,
         callback: VideoAdShowCallback = object : VideoAdShowCallback {}
     ) {
-        Log.d(TAG, "displaySplashActivity() called with: activity = $activity, callback = $callback")
+        Log.d(
+            TAG,
+            "displaySplashActivity() called with: activity = $activity, callback = $callback"
+        )
         if (!isSplashAdAvailable()) {
             callback.onFailedToDisplay()
-            loadSplashAd(activity)
+            loadSplashAd()
             return
         }
         splashAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
@@ -177,7 +170,7 @@ class AdMobController(val adConfiguration: AdConfiguration) {
                 Log.d(TAG, "onAdFailedToShowFullScreenContent() called with: p0 = $p0")
                 splashAd = null
                 callback.onFailedToDisplay()
-                loadSplashAd(activity)
+                loadSplashAd()
             }
 
             override fun onAdClicked() {
@@ -191,7 +184,7 @@ class AdMobController(val adConfiguration: AdConfiguration) {
                 Log.d(TAG, "onAdDismissedFullScreenContent() called")
                 splashAd = null
                 callback.onClosed()
-                loadSplashAd(activity)
+                loadSplashAd()
             }
         }
         splashAd?.show(activity)

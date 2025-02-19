@@ -74,12 +74,11 @@ class AdManager(
     /**
      * Loads an AdMob interstitial ad.
      *
-     * @param context The application context.
      * @param callback Callback for video ad load events.
      */
-    fun loadAdMobInterstitialAd(context: Context, callback: VideoAdLoadCallback) {
+    fun loadAdMobInterstitialAd(callback: VideoAdLoadCallback) {
         Log.d(TAG, "loadAdMobInterstitialAd() called")
-        adMobHelper.loadInterstitialAd(context, callback)
+        adMobHelper.loadInterstitialAd(callback)
     }
 
     /**
@@ -95,12 +94,11 @@ class AdManager(
 
     /**
      * Loads an AdMob splash ad.
-     * @param context The application context.
      * @param callback Callback for video ad load events.
      */
-    fun loadAdMobSplashAd(context: Context, callback: VideoAdLoadCallback) {
+    fun loadAdMobSplashAd(callback: VideoAdLoadCallback = object : VideoAdLoadCallback{}) {
         Log.d(TAG, "loadAdMobSplashAd() called")
-        adMobHelper.loadSplashAd(context, callback)
+        adMobHelper.loadSplashAd(callback)
     }
 
     /**

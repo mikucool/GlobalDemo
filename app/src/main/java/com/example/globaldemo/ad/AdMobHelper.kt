@@ -1,7 +1,6 @@
 package com.example.globaldemo.ad
 
 import android.app.Activity
-import android.content.Context
 import com.example.globaldemo.GlobalDemoApplication.Companion.container
 import com.example.globaldemo.ad.callback.VideoAdLoadCallback
 import com.example.globaldemo.ad.callback.VideoAdShowCallback
@@ -18,20 +17,16 @@ class AdMobHelper(private val appDataSourceUseCase: AppDataSourceUseCase = conta
         }
     }
 
-    fun loadInterstitialAd(
-        context: Context,
-        callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}
-    ) = controller.loadInterstitialAd(context, callback)
+    fun loadInterstitialAd(callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}) =
+        controller.loadInterstitialAd(callback)
 
     fun displayInterstitialAd(
         activity: Activity,
         callback: VideoAdShowCallback = object : VideoAdShowCallback {}
     ) = controller.displayInterstitialAd(activity, callback)
 
-    fun loadSplashAd(
-        context: Context,
-        callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}
-    ) = controller.loadSplashAd(context, callback)
+    fun loadSplashAd(callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}) =
+        controller.loadSplashAd(callback)
 
     fun displaySplashAd(
         activity: Activity,

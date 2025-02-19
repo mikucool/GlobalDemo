@@ -22,7 +22,7 @@
         android:layout_marginBottom="64dp"
         android:paddingHorizontal="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:max="100"
-        tools:progress="39" />
+        tools:max="10000"
+        tools:progress="3939" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

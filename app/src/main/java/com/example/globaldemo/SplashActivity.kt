@@ -1,8 +1,9 @@
 package com.example.globaldemo
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.util.Log
-import androidx.activity.viewModels
+import android.content.Intent
+import android.view.animation.DecelerateInterpolator
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,43 +15,73 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : BaseActivity<ActivitySplashBinding>() {
-    private val viewModel by viewModels<SplashViewModel> { SplashViewModel.Factory }
     override fun createBinding() = ActivitySplashBinding.inflate(layoutInflater)
 
     override fun initView() {
+        startProgressAnimation()
     }
 
     override fun createObserver() {
-        // Use repeatOnLifecycle for better lifecycle management.
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // Collect the state flow from the adSdkViewModel.
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
                 GlobalDemoApplication.instance.adSdkViewModel.adSdkInitState.observe(this@SplashActivity) {
-                    if (it.isAdMobInitialized) {
-                        loadAndShowSplashAd()
-                    }
+                    if (it.isAdMobInitialized) loadAndShowSplashAd()
                 }
             }
         }
     }
 
     override fun initData() {
-        viewModel.checkUserInfo()
+    }
+
+    private val progressAnimator by lazy { ValueAnimator.ofInt(0, binding.progressBar.max) }
+    private fun startProgressAnimation() {
+        progressAnimator.apply {
+            duration = 8000
+            interpolator = DecelerateInterpolator()
+            addUpdateListener {
+                val value = it.animatedValue as Int
+                binding.progressBar.progress = value
+                if (value >= binding.progressBar.max) startMainScreen()
+            }
+            start()
+        }
     }
 
     private fun loadAndShowSplashAd() {
         val adManager = GlobalDemoApplication.container.adManager
-        Log.d("SplashActivity", "loadAndShowSplashAd() called")
         adManager.loadAdMobSplashAd(
-            context = this,
             callback = object : VideoAdLoadCallback {
                 override fun onLoaded() {
                     adManager.displayAdMobSplashAd(
                         activity = this@SplashActivity,
-                        callback = object : VideoAdShowCallback {}
+                        callback = object : VideoAdShowCallback {
+                            override fun onDisplayed() {
+                                progressAnimator.cancel()
+                            }
+
+                            override fun onClosed() {
+                                startMainScreen()
+                            }
+                        }
                     )
                 }
             }
         )
     }
+
+    private fun startMainScreen() {
+        startActivity(Intent(this@SplashActivity, TestActivity::class.java))
+        finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (progressAnimator.isRunning) {
+            progressAnimator.cancel()
+        }
+        progressAnimator.removeAllUpdateListeners()
+        progressAnimator.removeAllListeners()
+    }
+
 }
