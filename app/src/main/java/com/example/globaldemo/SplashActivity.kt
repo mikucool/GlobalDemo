@@ -77,6 +77,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
 
     override fun onDestroy() {
         super.onDestroy()
+        GlobalDemoApplication.container.adManager.clearAdMobSplashCallback()
         if (progressAnimator.isRunning) {
             progressAnimator.cancel()
         }

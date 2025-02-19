@@ -111,6 +111,15 @@ class AdManager(
         adMobHelper.displaySplashAd(activity, callback)
     }
 
+    fun clearAdMobSplashCallback() = run {
+        adMobHelper.clearSplashLoadCallback()
+        adMobHelper.clearSplashDisplayCallback()
+    }
+    fun clearAdMobInterstitialCallback() = run {
+        adMobHelper.clearInterstitialLoadCallback()
+        adMobHelper.clearInterstitialDisplayCallback()
+    }
+
     companion object {
         private const val TAG = "AdManager"
     }

@@ -34,8 +34,13 @@ class AdMobController(val adConfiguration: AdConfiguration) {
     private var interstitialAd: InterstitialAd? = null
     private var splashAd: AppOpenAd? = null
 
+    // prevent memory leaking
+    private var interstitialLoadCallback: VideoAdLoadCallback? = null
+    fun clearInterstitialLoadCallback() = run { interstitialLoadCallback = null }
+    private var interstitialAdLoadedTime = 0L
     fun loadInterstitialAd(callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}) {
         val context: Context = GlobalDemoApplication.instance
+        interstitialLoadCallback = callback
         Log.d(TAG, "loadInterstitialAds() called with: context = $context, callback = $callback")
         val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(
@@ -47,16 +52,17 @@ class AdMobController(val adConfiguration: AdConfiguration) {
                     Log.d(TAG, "onAdLoaded() called with: p0 = $p0")
                     super.onAdLoaded(p0)
                     interstitialAd = p0
+                    interstitialAdLoadedTime = Date().time
                     interstitialAd?.onPaidEventListener = OnPaidEventListener {
                         Log.d(TAG, "onAdPaid() called with: p0 = $it")
                     }
-                    callback.onLoaded()
+                    interstitialLoadCallback?.onLoaded()
                 }
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
                     Log.d(TAG, "onAdFailedToLoad() called with: p0 = $p0")
                     super.onAdFailedToLoad(p0)
-                    callback.onFailedToLoad(
+                    interstitialLoadCallback?.onFailedToLoad(
                         AdFailureInformation(
                             platform = adConfiguration.adPlatform,
                             adId = interstitialAdId,
@@ -69,23 +75,27 @@ class AdMobController(val adConfiguration: AdConfiguration) {
         )
     }
 
+    // prevent memory leaking
+    private var interstitialDisplayCallback: VideoAdShowCallback? = null
+    fun clearInterstitialDisplayCallback() = run { interstitialDisplayCallback = null }
     fun displayInterstitialAd(activity: Activity, callback: VideoAdShowCallback) {
         if (!isInterstitialAdAvailable()) {
             callback.onFailedToDisplay()
             return
         }
+        interstitialDisplayCallback = callback
         interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdClicked() {
                 // Called when a click is recorded for an ad.
                 Log.d(TAG, "Ad was clicked.")
-                callback.onClicked()
+                interstitialDisplayCallback?.onClicked()
             }
 
             override fun onAdDismissedFullScreenContent() {
                 // Called when ad is dismissed.
                 Log.d(TAG, "Ad dismissed fullscreen content.")
                 interstitialAd = null
-                callback.onClosed()
+                interstitialDisplayCallback?.onClosed()
             }
 
             override fun onAdFailedToShowFullScreenContent(p0: AdError) {
@@ -93,7 +103,7 @@ class AdMobController(val adConfiguration: AdConfiguration) {
                 // Called when ad fails to show.
                 Log.d(TAG, "Ad failed to show fullscreen content.")
                 interstitialAd = null
-                callback.onFailedToDisplay()
+                interstitialDisplayCallback?.onFailedToDisplay()
             }
 
             override fun onAdImpression() {
@@ -104,7 +114,7 @@ class AdMobController(val adConfiguration: AdConfiguration) {
             override fun onAdShowedFullScreenContent() {
                 // Called when ad is shown.
                 Log.d(TAG, "Ad showed fullscreen content.")
-                callback.onDisplayed()
+                interstitialDisplayCallback?.onDisplayed()
             }
         }
 
@@ -112,10 +122,13 @@ class AdMobController(val adConfiguration: AdConfiguration) {
 
     }
 
-    private var loadTime = 0L
+    // prevent memory leaking
+    private var splashLoadCallback: VideoAdLoadCallback? = null
+    fun clearSplashLoadCallback() = run { splashLoadCallback = null }
+    private var splashAdLoadedTime = 0L
     fun loadSplashAd(callback: VideoAdLoadCallback = object : VideoAdLoadCallback {}) {
         val context: Context = GlobalDemoApplication.instance
-        Log.d(TAG, "loadSplashAd() called with: callback = $callback")
+        splashLoadCallback = callback
         val adRequest = AdRequest.Builder().build()
         AppOpenAd.load(
             context,
@@ -126,14 +139,14 @@ class AdMobController(val adConfiguration: AdConfiguration) {
                     super.onAdLoaded(p0)
                     Log.d(TAG, "onAdLoaded() called with: p0 = $p0")
                     splashAd = p0
-                    loadTime = Date().time
-                    callback.onLoaded()
+                    splashAdLoadedTime = Date().time
+                    splashLoadCallback?.onLoaded()
                 }
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
                     super.onAdFailedToLoad(p0)
                     Log.d(TAG, "onAdFailedToLoad() called with: p0 = $p0")
-                    callback.onFailedToLoad(
+                    splashLoadCallback?.onFailedToLoad(
                         AdFailureInformation(
                             platform = adConfiguration.adPlatform,
                             adId = splashAdId,
@@ -145,14 +158,14 @@ class AdMobController(val adConfiguration: AdConfiguration) {
         )
     }
 
+    // prevent memory leaking
+    private var splashDisplayCallback: VideoAdShowCallback? = null
+    fun clearSplashDisplayCallback() = run { splashDisplayCallback = null }
     fun displaySplashActivity(
         activity: Activity,
         callback: VideoAdShowCallback = object : VideoAdShowCallback {}
     ) {
-        Log.d(
-            TAG,
-            "displaySplashActivity() called with: activity = $activity, callback = $callback"
-        )
+        splashDisplayCallback = callback
         if (!isSplashAdAvailable()) {
             callback.onFailedToDisplay()
             loadSplashAd()
@@ -162,28 +175,28 @@ class AdMobController(val adConfiguration: AdConfiguration) {
             override fun onAdShowedFullScreenContent() {
                 super.onAdShowedFullScreenContent()
                 Log.d(TAG, "onAdShowedFullScreenContent() called")
-                callback.onDisplayed()
+                splashDisplayCallback?.onDisplayed()
             }
 
             override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                 super.onAdFailedToShowFullScreenContent(p0)
                 Log.d(TAG, "onAdFailedToShowFullScreenContent() called with: p0 = $p0")
                 splashAd = null
-                callback.onFailedToDisplay()
+                splashDisplayCallback?.onFailedToDisplay()
                 loadSplashAd()
             }
 
             override fun onAdClicked() {
                 super.onAdClicked()
                 Log.d(TAG, "onAdClicked() called")
-                callback.onClicked()
+                splashDisplayCallback?.onClicked()
             }
 
             override fun onAdDismissedFullScreenContent() {
                 super.onAdDismissedFullScreenContent()
                 Log.d(TAG, "onAdDismissedFullScreenContent() called")
                 splashAd = null
-                callback.onClosed()
+                splashDisplayCallback?.onClosed()
                 loadSplashAd()
             }
         }
@@ -191,16 +204,16 @@ class AdMobController(val adConfiguration: AdConfiguration) {
     }
 
     private fun isSplashAdAvailable(): Boolean {
-        return splashAd != null && wasLoadTimeLessThanNHoursAgo(SPLASH_EXPIRED_HOUR_TIME)
+        return splashAd != null && wasLoadTimeLessThanNHoursAgo(SPLASH_EXPIRED_HOUR_TIME, splashAdLoadedTime)
     }
 
     private fun isInterstitialAdAvailable(): Boolean {
-        return interstitialAd != null && wasLoadTimeLessThanNHoursAgo(INTERSTITIAL_EXPIRED_HOUR_TIME)
+        return interstitialAd != null && wasLoadTimeLessThanNHoursAgo(INTERSTITIAL_EXPIRED_HOUR_TIME, interstitialAdLoadedTime)
     }
 
     /** Utility method to check if ad was loaded more than n hours ago. */
-    private fun wasLoadTimeLessThanNHoursAgo(numHours: Long): Boolean {
-        val dateDifference: Long = Date().time - loadTime
+    private fun wasLoadTimeLessThanNHoursAgo(numHours: Long, adLoadedTime: Long): Boolean {
+        val dateDifference: Long = Date().time - adLoadedTime
         val numMilliSecondsPerHour: Long = 3600000
         return dateDifference < numMilliSecondsPerHour * numHours
     }

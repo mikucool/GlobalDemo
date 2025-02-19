@@ -33,4 +33,8 @@ class AdMobHelper(private val appDataSourceUseCase: AppDataSourceUseCase = conta
         callback: VideoAdShowCallback = object : VideoAdShowCallback {}
     ) = controller.displaySplashActivity(activity, callback)
 
+    fun clearSplashLoadCallback() = controller.clearSplashLoadCallback()
+    fun clearSplashDisplayCallback() = controller.clearSplashDisplayCallback()
+    fun clearInterstitialLoadCallback() = controller.clearInterstitialLoadCallback()
+    fun clearInterstitialDisplayCallback() = controller.clearInterstitialDisplayCallback()
 }
