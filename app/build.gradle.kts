@@ -85,8 +85,8 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
-
 
     // compose view-model
     implementation(libs.androidx.lifecycle.viewmodel.compose)

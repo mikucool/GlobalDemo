@@ -30,6 +30,7 @@ playServicesAppset = "16.1.0"
 retrofit = "2.11.0"
 thinkinganalyticssdk = "3.0.2"
 constraintlayout = "2.2.0"
+material = "1.12.0"
 
 [libraries]
 adapi = { module = "io.github.kwainetwork:adApi", version.ref = "adapi" }
@@ -72,6 +73,7 @@ play-services-appset = { module = "com.google.android.gms:play-services-appset",
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 squareup-leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroidVersion" }
 thinkinganalyticssdk = { module = "cn.thinkingdata.android:ThinkingAnalyticsSDK", version.ref = "thinkinganalyticssdk" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

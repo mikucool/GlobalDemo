@@ -10,6 +10,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.example.globaldemo.ad.callback.VideoAdLoadCallback
 import com.example.globaldemo.ad.callback.VideoAdShowCallback
 import com.example.globaldemo.databinding.ActivitySplashBinding
+import com.example.globaldemo.ui.MainActivity
 import com.example.globaldemo.utils.BaseActivity
 import kotlinx.coroutines.launch
 
@@ -71,7 +72,7 @@ class SplashActivity : BaseActivity<ActivitySplashBinding>() {
     }
 
     private fun startMainScreen() {
-        startActivity(Intent(this@SplashActivity, TestActivity::class.java))
+        startActivity(Intent(this@SplashActivity, MainActivity::class.java))
         finish()
     }
 

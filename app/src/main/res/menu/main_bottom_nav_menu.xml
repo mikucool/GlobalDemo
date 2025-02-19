@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_first"
+        android:title="@string/main_bottom_navigation_title_first" />
+
+    <item
+        android:id="@+id/navigation_second"
+        android:title="@string/main_bottom_navigation_title_second" />
+
+    <item
+        android:id="@+id/navigation_third"
+        android:title="@string/main_bottom_navigation_title_third" />
+
+    <item
+        android:id="@+id/navigation_fourth"
+        android:title="@string/main_bottom_navigation_title_fourth" />
+
+    <item
+        android:id="@+id/navigation_fifth"
+        android:title="@string/main_bottom_navigation_title_fifth" />
+
+</menu>

@@ -5,4 +5,10 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:statusBarColor">#00000000</item>
     </style>
+
+    <!--底部导航栏颜色-->
+    <style name="BottomNavigationTheme" parent="Theme.MaterialComponents.DayNight">
+        <item name="colorPrimary">@color/nav_color_on</item>
+        <item name="android:textColorSecondary">@color/nav_color_off</item>
+    </style>
 </resources>

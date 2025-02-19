@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">GlobalDemo</string>
+    <string name="main_bottom_navigation_title_first">FIRST</string>
+    <string name="main_bottom_navigation_title_second">SECOND</string>
+    <string name="main_bottom_navigation_title_third">THIRD</string>
+    <string name="main_bottom_navigation_title_fourth">FOURTH</string>
+    <string name="main_bottom_navigation_title_fifth">FIFTH</string>
 </resources>
